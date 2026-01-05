@@ -1,13 +1,33 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useReadingSettingsStore } from '../model/store';
 import { storeToRefs } from 'pinia';
 
-const store = useReadingSettingsStore();
-const { fontSize, fontFamily, pageWidth } = storeToRefs(store);
-const isOpen = ref(false);
+// Добавляем проп для управления направлением открытия
+const props = withDefaults(defineProps<{
+  placement?: 'bottom' | 'top'
+}>(), {
+  placement: 'bottom'
+});
 
+const store = useReadingSettingsStore();
+const { fontSize, fontFamily, pageWidth, lineHeight } = storeToRefs(store);
+
+const isOpen = ref(false);
 const toggle = () => (isOpen.value = !isOpen.value);
+
+const lineHeights = [
+  { label: 'Compact', value: 1.4, icon: 'density_small' },
+  { label: 'Standard', value: 1.8, icon: 'density_medium' },
+  { label: 'Loose', value: 2.2, icon: 'density_large' }
+];
+
+// Вычисляем классы позиционирования на основе пропа placement
+const panelPositionClasses = computed(() => {
+  return props.placement === 'top'
+    ? 'bottom-full mb-3 right-0 origin-bottom-right' // Открываем вверх
+    : 'top-full mt-2 right-0 origin-top-right';      // Открываем вниз (по умолчанию)
+});
 </script>
 
 <template>
@@ -16,21 +36,24 @@ const toggle = () => (isOpen.value = !isOpen.value);
     <button
       @click="toggle"
       :class="[
-        'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-xs uppercase font-bold tracking-wider',
+        'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-xs uppercase font-bold tracking-wider shadow-sm',
         isOpen
           ? 'bg-accent text-background-primary border-accent'
           : 'bg-background-primary border-border text-text-secondary hover:text-text-primary'
       ]"
     >
-      <span class="material-symbols-outlined text-[18px]">text_fields</span>
+      <span class="material-symbols-outlined text-[20px]">text_fields</span>
       <span class="hidden sm:inline">Appearance</span>
     </button>
 
     <!-- Dropdown Panel -->
-    <transition name="fade-slide">
+    <transition name="fade-scale">
       <div
         v-if="isOpen"
-        class="absolute right-0 top-full mt-2 w-72 bg-background-primary/95 backdrop-blur-xl border border-border rounded-xl shadow-2xl p-5 flex flex-col gap-6"
+        :class="[
+          'absolute w-72 max-w-[calc(100vw-3rem)] bg-background-primary/95 backdrop-blur-xl border border-border rounded-xl shadow-2xl p-5 flex flex-col gap-6',
+          panelPositionClasses
+        ]"
       >
         <!-- Font Size -->
         <div class="flex flex-col gap-2">
@@ -77,6 +100,27 @@ const toggle = () => (isOpen.value = !isOpen.value);
           </div>
         </div>
 
+        <!-- Line Height -->
+        <div class="flex flex-col gap-2">
+          <span class="text-xs text-text-muted font-bold uppercase tracking-widest">Spacing</span>
+          <div class="flex gap-2">
+            <button
+              v-for="lh in lineHeights"
+              :key="lh.value"
+              @click="store.setLineHeight(lh.value)"
+              :class="[
+                'flex-1 py-2 rounded border transition-all flex items-center justify-center',
+                lineHeight === lh.value
+                  ? 'border-accent text-accent bg-accent/5'
+                  : 'border-border text-text-muted hover:border-text-muted'
+              ]"
+              :title="lh.label"
+            >
+              <span class="material-symbols-outlined text-[16px]">{{ lh.icon }}</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Width -->
         <div class="flex flex-col gap-2">
           <span class="text-xs text-text-muted font-bold uppercase tracking-widest">Width</span>
@@ -105,13 +149,13 @@ const toggle = () => (isOpen.value = !isOpen.value);
 </template>
 
 <style scoped>
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-  transition: all 0.2s ease;
+.fade-scale-enter-active,
+.fade-scale-leave-active {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.fade-slide-enter-from,
-.fade-slide-leave-to {
+.fade-scale-enter-from,
+.fade-scale-leave-to {
   opacity: 0;
-  transform: translateY(-10px);
+  transform: scale(0.95);
 }
 </style>

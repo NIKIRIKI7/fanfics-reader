@@ -5,17 +5,16 @@ export type FontFamily = 'serif' | 'sans';
 export type PageWidth = 'narrow' | 'standard' | 'wide';
 
 export const useReadingSettingsStore = defineStore('readingSettings', () => {
-  // Инициализируем из localStorage или значениями по умолчанию
   const getSaved = <T>(key: string, def: T): T => {
     const saved = localStorage.getItem(`reading_${key}`);
     return saved ? (JSON.parse(saved) as T) : def;
   };
 
-  const fontSize = ref<number>(getSaved('fontSize', 18)); // px
+  const fontSize = ref<number>(getSaved('fontSize', 18));
   const fontFamily = ref<FontFamily>(getSaved('fontFamily', 'serif'));
   const pageWidth = ref<PageWidth>(getSaved('pageWidth', 'standard'));
+  const lineHeight = ref<number>(getSaved('lineHeight', 1.8));
 
-  // Действия
   const increaseFont = () => {
     if (fontSize.value < 32) fontSize.value += 2;
   };
@@ -32,20 +31,26 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
     pageWidth.value = width;
   };
 
-  // Сохранение в LocalStorage при изменении
-  watch([fontSize, fontFamily, pageWidth], () => {
+  const setLineHeight = (height: number) => {
+    lineHeight.value = height;
+  };
+
+  watch([fontSize, fontFamily, pageWidth, lineHeight], () => {
     localStorage.setItem('reading_fontSize', JSON.stringify(fontSize.value));
     localStorage.setItem('reading_fontFamily', JSON.stringify(fontFamily.value));
     localStorage.setItem('reading_pageWidth', JSON.stringify(pageWidth.value));
+    localStorage.setItem('reading_lineHeight', JSON.stringify(lineHeight.value));
   });
 
   return {
     fontSize,
     fontFamily,
     pageWidth,
+    lineHeight,
     increaseFont,
     decreaseFont,
     setFontFamily,
     setPageWidth,
+    setLineHeight
   };
 });
