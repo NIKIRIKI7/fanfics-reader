@@ -1,0 +1,1 @@
+export { default as WorkDetailsPage } from './ui/WorkDetailsPage.vue';
