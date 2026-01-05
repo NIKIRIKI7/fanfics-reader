@@ -1,20 +1,29 @@
 <script setup lang="ts">
-// ИСПРАВЛЕНО: Импорты через Public API
+import { ref } from 'vue';
 import { useWorkFilterStore, WorkFilter } from '@/features/filter-works';
-import { WorkCard } from '@/entities/work';
+import { WorkCard, WorkCardSkeleton } from '@/entities/work';
 import { storeToRefs } from 'pinia';
 
 const store = useWorkFilterStore();
 const { filteredWorks } = storeToRefs(store);
+
+// Ставим false, так как данные локальные и доступны мгновенно.
+// При подключении API здесь будет true, а в fetch() переключится на false.
+const isLoading = ref(false);
 </script>
 
 <template>
   <section>
     <!-- Feature: Filter -->
-    <WorkFilter />
+    <WorkFilter class="mb-8" />
 
-    <!-- List of Entities -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
+    <!-- Loading State: Skeletons -->
+    <div v-if="isLoading" class="grid grid-cols-1 gap-6">
+      <WorkCardSkeleton v-for="i in 3" :key="i" />
+    </div>
+
+    <!-- Data State: Real Cards -->
+    <div v-else class="grid grid-cols-1 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <WorkCard
         v-for="work in filteredWorks"
         :key="work.id"
