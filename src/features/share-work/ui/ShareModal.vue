@@ -40,9 +40,6 @@ const downloadImage = async () => {
       logging: false,
       useCORS: true,
       allowTaint: true,
-      // ВАЖНО: onclone позволяет нам модифицировать элемент перед снимком,
-      // если нужно убрать скругления или изменить стили только для картинки.
-      // Но в данном случае градиент решит проблему и без этого.
     });
 
     const link = document.createElement('a');
@@ -73,12 +70,6 @@ const downloadImage = async () => {
           </div>
 
           <div class="p-6 bg-background-secondary flex justify-center overflow-hidden">
-            <!--
-               ИСПРАВЛЕНИЕ:
-               1. Убрали отдельный div для декорации.
-               2. Добавили radial-gradient в background-image. Это безопасно для html2canvas.
-               3. Явно задали цвет текста, чтобы не зависеть от переменных.
-            -->
             <div
               ref="cardRef"
               class="bg-background-primary border border-border p-8 rounded-lg w-full max-w-[360px] flex flex-col gap-6 relative"
@@ -95,7 +86,11 @@ const downloadImage = async () => {
                   <span class="text-accent text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Project: Grey Sky</span>
                   <span class="text-text-secondary text-xs font-sans">{{ work.author }}</span>
                 </div>
-                <div class="px-2 py-1 rounded border border-border text-[10px] font-bold text-text-muted uppercase" style="border-color: #262626; color: #737373;">
+
+                <div
+                  class="px-2 py-1 rounded border border-border text-[10px] font-bold text-text-muted uppercase flex items-center justify-center leading-none"
+                  style="border-color: #262626; color: #737373; min-width: 32px;"
+                >
                   {{ work.rating }}
                 </div>
               </div>
@@ -105,15 +100,10 @@ const downloadImage = async () => {
                 <h3 class="text-3xl font-display font-black italic text-text-primary leading-tight" style="color: #ffffff;">
                   {{ work.title }}
                 </h3>
-                <div class="w-12 h-1 bg-accent" style="background-color: #ffffff;"></div>
+                <!-- УДАЛЕНА БЕЛАЯ ПОЛОСКА -->
               </div>
 
               <!-- Summary -->
-              <!--
-                 ВАЖНО: html2canvas плохо работает с line-clamp.
-                 Если текст будет обрезаться некорректно, лучше убрать line-clamp
-                 или задать фиксированную высоту и overflow: hidden
-              -->
               <p class="text-text-secondary text-sm font-display italic leading-relaxed relative z-10" style="color: #a3a3a3;">
                 "{{ work.summary }}"
               </p>

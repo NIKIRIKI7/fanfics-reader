@@ -4,7 +4,7 @@ import type { Work } from '@/entities/work';
 
 export const useViewHistoryStore = defineStore('viewHistory', () => {
   const history = ref<Work[]>([]);
-  const MAX_ITEMS = 6; // Ограничиваем количество
+  const MAX_ITEMS = 4; // ИЗМЕНЕНО: 4 элемента для красивой сетки
 
   // Инициализация из localStorage
   const init = () => {
