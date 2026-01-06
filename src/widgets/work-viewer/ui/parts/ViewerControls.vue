@@ -11,7 +11,7 @@ defineEmits<{
 </script>
 
 <template>
-  <div class="sticky top-20 z-30 flex justify-between items-center bg-background-secondary/90 backdrop-blur p-4 rounded-lg border border-border mb-8 shadow-sm transition-all">
+  <div class="relative flex justify-between items-center bg-background-secondary/90 backdrop-blur p-4 rounded-lg border border-border mb-8 shadow-sm transition-all">
     <button 
       @click="$emit('prev')"
       :disabled="currentChapter <= 1"

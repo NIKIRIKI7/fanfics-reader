@@ -46,17 +46,26 @@ const prevChapter = () => {
     <ViewerHeader :work="work" />
 
     <!-- 3. Toolbar: Controls + Settings -->
-    <div class="sticky top-4 z-30 flex gap-4 items-start justify-between mb-8 pointer-events-none">
-      <div class="pointer-events-auto flex-1 max-w-2xl mx-auto w-full">
+    <!--
+       ИЗМЕНЕНИЯ:
+       1. Убрали "sticky top-4 z-30 pointer-events-none"
+       2. Оставили просто flex-контейнер
+    -->
+    <div class="flex gap-4 items-start justify-between mb-8 relative z-20">
+
+      <!-- Controls (Arrows + Chapter info) -->
+      <div class="flex-1 max-w-2xl mx-auto w-full">
+        <!-- Убрали "!sticky !top-0" из классов -->
         <ViewerControls
           :current-chapter="currentChapter"
           :total-chapters="work.stats.chapters"
-          @next="nextChapter"
-          @prev="prevChapter"
-          class="!mb-0 !sticky !top-0 shadow-lg"
+          @next="nextChapter" @prev="prevChapter"
+          class="!mb-0"
         />
       </div>
-      <div class="pointer-events-auto pt-2 hidden md:block">
+
+      <!-- Desktop Settings Button -->
+      <div class="pt-2 hidden md:block">
         <ReaderSettings />
       </div>
     </div>
