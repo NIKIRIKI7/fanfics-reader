@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed } from 'vue'; // ref больше не нужен для открытия
 import { useReadingSettingsStore, type Theme } from '../model/store';
 import { storeToRefs } from 'pinia';
 
@@ -10,10 +10,12 @@ const props = withDefaults(defineProps<{
 });
 
 const store = useReadingSettingsStore();
-const { fontSize, fontWeight, letterSpacing, fontFamily, pageWidth, lineHeight, theme } = storeToRefs(store);
+const {
+  fontSize, fontWeight, letterSpacing, fontFamily,
+  pageWidth, lineHeight, theme, isSettingsOpen // Достаем isSettingsOpen
+} = storeToRefs(store);
 
-const isOpen = ref(false);
-const toggle = () => (isOpen.value = !isOpen.value);
+// Убрали локальный const isOpen = ref(false);
 
 const lineHeights = [
   { label: 'Compact', value: 1.4, icon: 'density_small' },
@@ -38,12 +40,12 @@ const panelPositionClasses = computed(() => {
 
 <template>
   <div class="relative z-40">
-    <!-- Toggle Button -->
+    <!-- ИЗМЕНЕНИЕ: @click вызывает store.toggleSettings -->
     <button
-      @click="toggle"
+      @click="store.toggleSettings"
       :class="[
         'flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-xs uppercase font-bold tracking-wider shadow-sm',
-        isOpen
+        isSettingsOpen
           ? 'bg-accent text-background-primary border-accent'
           : 'bg-background-primary border-border text-text-secondary hover:text-text-primary'
       ]"
@@ -52,10 +54,10 @@ const panelPositionClasses = computed(() => {
       <span class="hidden sm:inline">Appearance</span>
     </button>
 
-    <!-- Dropdown Panel -->
     <transition name="fade-scale">
+      <!-- ИЗМЕНЕНИЕ: v-if зависит от isSettingsOpen -->
       <div
-        v-if="isOpen"
+        v-if="isSettingsOpen"
         :class="[
           'absolute w-72 max-w-[calc(100vw-3rem)] bg-background-primary/95 backdrop-blur-xl border border-border rounded-xl shadow-2xl p-5 flex flex-col gap-6 max-h-[80vh] overflow-y-auto custom-scrollbar',
           panelPositionClasses

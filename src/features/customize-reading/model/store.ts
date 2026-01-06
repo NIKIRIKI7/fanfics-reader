@@ -30,6 +30,9 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
   // НОВОЕ СОСТОЯНИЕ: Focus Mode (не сохраняем в LS)
   const isFocusMode = ref(false);
 
+  // НОВОЕ СОСТОЯНИЕ: Видимость меню настроек
+  const isSettingsOpen = ref(false);
+
   // --- ACTIONS ---
 
   const increaseFont = () => { if (fontSize.value < 32) fontSize.value += 2; };
@@ -51,6 +54,10 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
   const setFocusMode = (value: boolean) => { isFocusMode.value = value; };
   const toggleFocusMode = () => { isFocusMode.value = !isFocusMode.value; };
 
+  // НОВЫЕ ACTIONS для меню
+  const toggleSettings = () => { isSettingsOpen.value = !isSettingsOpen.value; };
+  const setSettingsOpen = (value: boolean) => { isSettingsOpen.value = value; };
+
   // --- WATCHER ---
   watch([fontSize, fontWeight, letterSpacing, fontFamily, pageWidth, lineHeight, theme], () => {
     localStorage.setItem('reading_fontSize', JSON.stringify(fontSize.value));
@@ -70,7 +77,8 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
     pageWidth,
     lineHeight,
     theme,
-    isFocusMode, // Экспорт
+    isFocusMode,
+    isSettingsOpen, // Экспорт
     increaseFont,
     decreaseFont,
     increaseWeight,
@@ -81,7 +89,9 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
     setPageWidth,
     setLineHeight,
     setTheme,
-    setFocusMode, // Экспорт
-    toggleFocusMode // Экспорт
+    setFocusMode,
+    toggleFocusMode,
+    toggleSettings, // Экспорт
+    setSettingsOpen // Экспорт
   };
 });

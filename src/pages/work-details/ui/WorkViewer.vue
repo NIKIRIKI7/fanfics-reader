@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import type { Work } from '@/entities/work';
 
 // Local Parts
@@ -39,13 +39,6 @@ const handleScroll = () => {
   }, 500);
 };
 
-// Focus Mode Logic (ESC Key)
-const handleKeydown = (e: KeyboardEvent) => {
-  if (e.key === 'Escape' && isFocusMode.value) {
-    settingsStore.setFocusMode(false);
-  }
-};
-
 // Navigation
 const nextChapter = () => {
   if (currentChapter.value < props.work.stats.chapters) {
@@ -62,6 +55,41 @@ const prevChapter = () => {
   }
 };
 
+// --- KEYBOARD CONTROL LOGIC ---
+const handleKeydown = (e: KeyboardEvent) => {
+  // Игнорируем нажатия, если фокус в инпуте
+  if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+  // 1. Стрелка влево - Предыдущая глава
+  if (e.key === 'ArrowLeft') {
+    prevChapter();
+  }
+
+  // 2. Стрелка вправо - Следующая глава
+  if (e.key === 'ArrowRight') {
+    nextChapter();
+  }
+
+  // 3. Клавиша M - Меню настроек
+  if (e.key.toLowerCase() === 'm') {
+    settingsStore.toggleSettings();
+  }
+
+  // 4. НОВОЕ: Клавиша F - Focus Mode (Дзен режим)
+  if (e.key.toLowerCase() === 'f') {
+    settingsStore.toggleFocusMode();
+  }
+
+  // 5. Escape - Выход из Focus Mode или закрытие меню
+  if (e.key === 'Escape') {
+    if (settingsStore.isSettingsOpen) {
+      settingsStore.setSettingsOpen(false);
+    } else if (isFocusMode.value) {
+      settingsStore.setFocusMode(false);
+    }
+  }
+};
+
 // Resume Logic
 const checkProgress = () => {
   const saved = progressStore.getProgress(props.work.slug);
@@ -73,21 +101,12 @@ const checkProgress = () => {
 };
 const resumeReading = async () => {
   if (!savedProgressState.value) return;
-
   const { chapter, scroll } = savedProgressState.value;
-
-  // 1. Устанавливаем главу
   currentChapter.value = chapter;
   showResumePrompt.value = false;
-
-  // 2. Ждем ре-рендера контента
-  await nextTick();
-
-  // 3. Восстанавливаем скролл
-  window.scrollTo({
-    top: scroll,
-    behavior: 'smooth'
-  });
+  setTimeout(() => {
+    window.scrollTo({ top: scroll, behavior: 'smooth' });
+  }, 50);
 };
 const closePrompt = () => { showResumePrompt.value = false; };
 
@@ -96,7 +115,6 @@ onMounted(() => {
   if (viewerContentRef.value) contentElement.value = viewerContentRef.value.contentElement;
   checkProgress();
   window.addEventListener('scroll', handleScroll, { passive: true });
-  // Слушаем ESC
   window.addEventListener('keydown', handleKeydown);
 });
 
@@ -104,15 +122,15 @@ onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
   window.removeEventListener('keydown', handleKeydown);
   if (scrollTimeout) clearTimeout(scrollTimeout);
-  // При уходе со страницы выключаем режим фокуса, чтобы он не сломал другие страницы
   settingsStore.setFocusMode(false);
+  settingsStore.setSettingsOpen(false);
 });
 </script>
 
 <template>
   <div class="animate-in fade-in duration-500 relative min-h-screen">
 
-    <!-- Кнопка выхода из Zen Mode (Видна только когда isFocusMode = true) -->
+    <!-- Кнопка выхода из Zen Mode -->
     <transition name="fade">
       <button
         v-if="isFocusMode"
@@ -126,31 +144,29 @@ onUnmounted(() => {
 
     <ReadingProgress :target-element="contentElement" />
 
-    <!-- Скрываем заголовок в режиме фокуса для максимального погружения -->
     <transition name="fade">
       <div v-show="!isFocusMode">
         <ViewerHeader :work="work" />
       </div>
     </transition>
 
-    <!-- Toolbar: Скрываем в режиме фокуса -->
     <transition name="slide-up">
       <div v-show="!isFocusMode" class="flex gap-4 items-start justify-between mb-8 relative z-20">
         <div class="flex-1 max-w-2xl mx-auto w-full">
           <ViewerControls
             :current-chapter="currentChapter"
             :total-chapters="work.stats.chapters"
-            @next="nextChapter" @prev="prevChapter"
+            @next="nextChapter"
+            @prev="prevChapter"
             class="!mb-0"
           />
         </div>
 
         <div class="pt-2 hidden md:flex items-center gap-2">
-          <!-- Кнопка включения Zen Mode -->
           <button
             @click="settingsStore.setFocusMode(true)"
             class="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background-primary text-text-muted hover:text-text-primary hover:border-text-muted transition-all text-xs uppercase font-bold tracking-wider shadow-sm"
-            title="Enter Focus Mode"
+            title="Enter Focus Mode (F)"
           >
             <span class="material-symbols-outlined text-[20px]">open_in_full</span>
             <span class="hidden xl:inline">Focus</span>
@@ -161,9 +177,7 @@ onUnmounted(() => {
       </div>
     </transition>
 
-    <!-- Mobile Settings -->
     <div v-show="!isFocusMode" class="md:hidden fixed bottom-6 right-6 z-40 flex flex-col gap-3 items-end">
-       <!-- Кнопка Zen Mode для мобильных -->
       <button
         @click="settingsStore.setFocusMode(true)"
         class="p-3 rounded-full bg-background-primary border border-border shadow-lg text-text-secondary"
@@ -181,12 +195,8 @@ onUnmounted(() => {
     <ResumePrompt
       :is-visible="showResumePrompt"
       :chapter="savedProgressState?.chapter || 1"
-      @resume="resumeReading" @close="closePrompt"
+      @resume="resumeReading"
+      @close="closePrompt"
     />
   </div>
 </template>
-
-<style scoped>
-.slide-up-enter-active, .slide-up-leave-active { transition: all 0.3s ease; }
-.slide-up-enter-from, .slide-up-leave-to { opacity: 0; transform: translateY(-20px); }
-</style>
