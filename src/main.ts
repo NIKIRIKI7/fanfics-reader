@@ -3,15 +3,17 @@ import { createPinia } from 'pinia';
 import App from './App.vue';
 import router from './app/router';
 
-// Import CSS with Tailwind v4 config
+// 1. Иконки (из node_modules)
+// Подключаем именно Outlined версию, как в дизайне
+import 'material-symbols/outlined.css';
+
+// 2. Локальные шрифты для текста (Literata + Inter)
+import './app/styles/fonts.css';
+
+// 3. Основные стили (Tailwind)
 import './app/styles/main.css';
 
 const app = createApp(App);
-
 app.use(createPinia());
 app.use(router);
-
 app.mount('#app');
-
-// Logging for debug
-console.log('[App] Initialized with Feature-Sliced Design');

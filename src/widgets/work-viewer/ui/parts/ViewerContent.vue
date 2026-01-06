@@ -6,7 +6,8 @@ import { storeToRefs } from 'pinia';
 defineProps<{ content: string }>();
 
 const store = useReadingSettingsStore();
-const { fontSize, fontFamily, pageWidth, lineHeight } = storeToRefs(store);
+// Добавляем fontWeight сюда
+const { fontSize, fontFamily, pageWidth, lineHeight, fontWeight } = storeToRefs(store);
 
 const contentRef = ref<HTMLElement | null>(null);
 
@@ -26,9 +27,11 @@ const containerClasses = computed(() => {
   return [widthClass, fontClass];
 });
 
+// Добавляем fontWeight в стили
 const styles = computed(() => ({
   fontSize: `${fontSize.value}px`,
-  lineHeight: `${lineHeight.value}`
+  lineHeight: `${lineHeight.value}`,
+  fontWeight: fontWeight.value
 }));
 </script>
 
@@ -52,18 +55,23 @@ const styles = computed(() => ({
 </template>
 
 <style scoped>
-/* Дополнительные переопределения для вложенных элементов, если Tailwind Typography будет упрямиться */
 .prose {
-  max-width: 100%; /* Разрешаем контейнеру занимать доступную ширину до ограничения max-w-[...] */
+  max-width: 100%;
 }
-
+/* Добавляем наследование жирности для параграфов */
 .prose p {
   margin-bottom: 1.5em;
   font-family: inherit;
+  font-weight: inherit; /* Важно! */
 }
-
 .prose div {
   display: flex;
   justify-content: center;
+}
+/* Если в тексте есть strong/b теги, они должны быть жирнее основного текста */
+.prose strong, .prose b {
+  font-weight: 700;
+  /* Или можно сделать умнее: calc(v-bind(fontWeight) + 300) если поддерживается */
+  color: var(--color-text-primary);
 }
 </style>

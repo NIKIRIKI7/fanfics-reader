@@ -1,0 +1,45 @@
+/* =========================================
+   1. Literata (Font Display / Serif)
+   Идеален для чтения (аналог Newsreader), отличная кириллица
+   ========================================= */
+
+/* Обычный (Normal) */
+@font-face {
+  font-family: 'Literata';
+  font-style: normal;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url('../assets/fonts/Literata-Variable.woff2') format('woff2'),
+  url('../assets/fonts/Literata-Variable.woff') format('woff'),
+  url('../assets/fonts/Literata-Variable.ttf') format('truetype');
+}
+
+/* Курсив (Italic) */
+@font-face {
+  font-family: 'Literata';
+  font-style: italic;
+  font-weight: 200 900;
+  font-display: swap;
+  src: url('../assets/fonts/Literata-Italic.woff2') format('woff2'),
+  url('../assets/fonts/Literata-Italic.woff') format('woff'),
+  url('../assets/fonts/Literata-Italic.ttf') format('truetype');
+}
+
+/* =========================================
+   2. Inter (Font Sans)
+   Современный интерфейсный шрифт, отличная кириллица
+   ========================================= */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  /* Inter поддерживает наклон (slnt) в вариативном файле,
+     но здесь мы подключаем его как обычный style: normal */
+  font-display: swap;
+  src: url('../assets/fonts/Inter-Variable.woff2') format('woff2'),
+  url('../assets/fonts/Inter-Variable.woff') format('woff'),
+  url('../assets/fonts/Inter-Variable.ttf') format('truetype');
+}
+
+/* Блок Material Symbols удален, так как подключен через NPM */

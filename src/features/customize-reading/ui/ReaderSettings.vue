@@ -3,7 +3,6 @@ import { ref, computed } from 'vue';
 import { useReadingSettingsStore } from '../model/store';
 import { storeToRefs } from 'pinia';
 
-// Добавляем проп для управления направлением открытия
 const props = withDefaults(defineProps<{
   placement?: 'bottom' | 'top'
 }>(), {
@@ -11,7 +10,7 @@ const props = withDefaults(defineProps<{
 });
 
 const store = useReadingSettingsStore();
-const { fontSize, fontFamily, pageWidth, lineHeight } = storeToRefs(store);
+const { fontSize, fontWeight, fontFamily, pageWidth, lineHeight } = storeToRefs(store);
 
 const isOpen = ref(false);
 const toggle = () => (isOpen.value = !isOpen.value);
@@ -22,11 +21,10 @@ const lineHeights = [
   { label: 'Loose', value: 2.2, icon: 'density_large' }
 ];
 
-// Вычисляем классы позиционирования на основе пропа placement
 const panelPositionClasses = computed(() => {
   return props.placement === 'top'
-    ? 'bottom-full mb-3 right-0 origin-bottom-right' // Открываем вверх
-    : 'top-full mt-2 right-0 origin-top-right';      // Открываем вниз (по умолчанию)
+    ? 'bottom-full mb-3 right-0 origin-bottom-right'
+    : 'top-full mt-2 right-0 origin-top-right';
 });
 </script>
 
@@ -55,7 +53,7 @@ const panelPositionClasses = computed(() => {
           panelPositionClasses
         ]"
       >
-        <!-- Font Size -->
+        <!-- 1. Font Size -->
         <div class="flex flex-col gap-2">
           <span class="text-xs text-text-muted font-bold uppercase tracking-widest">Size</span>
           <div class="flex items-center justify-between bg-background-tertiary rounded-lg p-1">
@@ -75,7 +73,34 @@ const panelPositionClasses = computed(() => {
           </div>
         </div>
 
-        <!-- Font Family -->
+        <!-- 2. Font Weight (Изменено на цифры) -->
+        <div class="flex flex-col gap-2">
+          <span class="text-xs text-text-muted font-bold uppercase tracking-widest">Weight</span>
+          <div class="flex items-center justify-between bg-background-tertiary rounded-lg p-1">
+            <button
+              @click="store.decreaseWeight"
+              class="w-10 h-8 flex items-center justify-center hover:bg-background-primary rounded transition-colors"
+              :disabled="fontWeight <= 100"
+              :class="{ 'opacity-50 cursor-not-allowed': fontWeight <= 100 }"
+            >
+              <span class="material-symbols-outlined text-sm">remove</span>
+            </button>
+
+            <!-- ЗДЕСЬ ИЗМЕНЕНИЕ: просто fontWeight вместо weightLabel -->
+            <span class="text-sm font-sans font-medium w-20 text-center">{{ fontWeight }}</span>
+
+            <button
+              @click="store.increaseWeight"
+              class="w-10 h-8 flex items-center justify-center hover:bg-background-primary rounded transition-colors"
+              :disabled="fontWeight >= 900"
+              :class="{ 'opacity-50 cursor-not-allowed': fontWeight >= 900 }"
+            >
+              <span class="material-symbols-outlined text-sm">add</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Font Family (Typeface) -->
         <div class="flex flex-col gap-2">
           <span class="text-xs text-text-muted font-bold uppercase tracking-widest">Typeface</span>
           <div class="flex bg-background-tertiary rounded-lg p-1">
@@ -92,7 +117,7 @@ const panelPositionClasses = computed(() => {
               @click="store.setFontFamily('sans')"
               :class="[
                 'flex-1 py-1.5 text-sm rounded transition-all font-sans',
-                fontFamily === 'sans' ? 'bg-background-primary shadow-sm text-text-primary' : 'text-text-muted hover:text-text-secondary'
+                fontFamily === 'sans' ? 'bg-background-primary shadow-sm text-text-primary' : 'text-text-muted hover:text-secondary'
               ]"
             >
               Sans
