@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Work } from '@/entities/work';
+import type { Work } from ' @/entities/work';
 import BaseTag from '@/shared/ui/BaseTag.vue';
 
 defineProps<{ work: Work }>();

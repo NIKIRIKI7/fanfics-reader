@@ -11,14 +11,14 @@ import BaseSkeleton from '@/shared/ui/BaseSkeleton.vue';
         <BaseSkeleton width="60px" height="24px" />
         <BaseSkeleton width="40px" height="24px" />
       </div>
-      
+
       <!-- Title -->
       <BaseSkeleton height="48px" width="80%" class="mb-4" />
       <BaseSkeleton height="48px" width="60%" class="mb-8" />
-      
+
       <!-- Stats -->
       <BaseSkeleton width="250px" height="20px" class="mb-8" />
-      
+
       <!-- Tags -->
       <div class="flex gap-2 justify-center w-full">
         <BaseSkeleton width="70px" height="24px" />

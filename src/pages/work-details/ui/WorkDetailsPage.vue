@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRoute, RouterLink } from 'vue-router';
-import { works } from '@/entities/work';
-import BaseButton from '@/shared/ui/BaseButton.vue';
-import { WorkViewer } from '@/widgets/work-viewer';
-import ViewerSkeleton from '@/widgets/work-viewer/ui/parts/ViewerSkeleton.vue';
+import { works } from ' @/entities/work';
+import BaseButton from ' @/shared/ui/BaseButton.vue';
+// Импортируем локальные компоненты вместо виджетов
+import WorkViewer from './WorkViewer.vue';
+import ViewerSkeleton from './parts/ViewerSkeleton.vue';
 
 const route = useRoute();
-
-// Сразу false для мгновенного отображения
 const isLoading = ref(false);
-
 const work = computed(() => works.find(w => w.slug === route.params.slug));
 </script>
 

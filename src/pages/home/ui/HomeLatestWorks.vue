@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { works } from '@/entities/work/api/mockData';
+// Исправление: Импорт через Public API ( @/entities/work), а не напрямую из api/mockData
+import { works } from '@/entities/work';
 import WorkCard from '@/entities/work/ui/WorkCard.vue';
 import { RouterLink } from 'vue-router';
 
-// Получаем 3 последние работы, исключая 'Archive'
 const latestWorks = computed(() => {
   return works
     .filter(w => w.type !== 'Archive')
@@ -26,11 +26,11 @@ const latestWorks = computed(() => {
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <WorkCard 
-        v-for="work in latestWorks" 
-        :key="work.id" 
+      <WorkCard
+        v-for="work in latestWorks"
+        :key="work.id"
         :work="work"
-        class="h-full" 
+        class="h-full"
       />
     </div>
 
@@ -43,13 +43,12 @@ const latestWorks = computed(() => {
 </template>
 
 <style scoped>
-/* Slight modification to WorkCard styles via parent for Grid layout if needed */
 :deep(article) {
-  flex-direction: column; /* Force column on grid */
+  flex-direction: column;
   height: 100%;
 }
 :deep(article .w-full.lg\:w-48) {
-  width: 100%; /* Force image full width in grid */
+  width: 100%;
   height: 200px;
 }
 </style>

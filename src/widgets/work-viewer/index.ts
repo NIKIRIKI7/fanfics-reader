@@ -1,1 +1,0 @@
-export { default as WorkViewer } from './ui/WorkViewer.vue';
