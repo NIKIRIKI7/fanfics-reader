@@ -11,6 +11,8 @@ import ReadingProgress from './parts/ReadingProgress.vue';
 // Features
 import { ReaderSettings, useReadingSettingsStore } from '@/features/customize-reading';
 import { useReadingProgressStore, ResumePrompt } from '@/features/reading-progress';
+import { useViewHistoryStore } from '@/features/view-history'; // Импорт фичи истории
+import { ShareButton } from '@/features/share-work'; // Импорт фичи шеринга
 import { storeToRefs } from 'pinia';
 
 const props = defineProps<{ work: Work }>();
@@ -18,6 +20,7 @@ const props = defineProps<{ work: Work }>();
 // Stores
 const progressStore = useReadingProgressStore();
 const settingsStore = useReadingSettingsStore();
+const historyStore = useViewHistoryStore(); // Инициализация стора истории
 const { isFocusMode } = storeToRefs(settingsStore);
 
 // State
@@ -114,6 +117,10 @@ const closePrompt = () => { showResumePrompt.value = false; };
 onMounted(() => {
   if (viewerContentRef.value) contentElement.value = viewerContentRef.value.contentElement;
   checkProgress();
+
+  // Добавляем работу в историю просмотров
+  historyStore.addWork(props.work);
+
   window.addEventListener('scroll', handleScroll, { passive: true });
   window.addEventListener('keydown', handleKeydown);
 });
@@ -163,6 +170,9 @@ onUnmounted(() => {
         </div>
 
         <div class="pt-2 hidden md:flex items-center gap-2">
+          <!-- Новая кнопка Share -->
+          <ShareButton :work="work" />
+
           <button
             @click="settingsStore.setFocusMode(true)"
             class="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background-primary text-text-muted hover:text-text-primary hover:border-text-muted transition-all text-xs uppercase font-bold tracking-wider shadow-sm"
@@ -171,13 +181,13 @@ onUnmounted(() => {
             <span class="material-symbols-outlined text-[20px]">open_in_full</span>
             <span class="hidden xl:inline">Focus</span>
           </button>
-
           <ReaderSettings />
         </div>
       </div>
     </transition>
 
     <div v-show="!isFocusMode" class="md:hidden fixed bottom-6 right-6 z-40 flex flex-col gap-3 items-end">
+      <ShareButton :work="work" />
       <button
         @click="settingsStore.setFocusMode(true)"
         class="p-3 rounded-full bg-background-primary border border-border shadow-lg text-text-secondary"

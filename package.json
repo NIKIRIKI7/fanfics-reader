@@ -16,6 +16,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "html2canvas": "^1.4.1",
     "material-symbols": "^0.40.2",
     "pinia": "^3.0.3",
     "vue": "^3.5.22",
