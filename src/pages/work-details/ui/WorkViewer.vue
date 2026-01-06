@@ -1,31 +1,56 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick } from 'vue';
 import type { Work } from '@/entities/work';
-// Локальные импорты частей
+
 import ViewerHeader from './parts/ViewerHeader.vue';
 import ViewerControls from './parts/ViewerControls.vue';
 import ViewerContent from './parts/ViewerContent.vue';
 import ReadingProgress from './parts/ReadingProgress.vue';
 
-// ВАЖНО: Вот этот импорт связывает фичу со страницей
+// Features
 import { ReaderSettings } from '@/features/customize-reading';
+// НОВАЯ ФИЧА
+import { useReadingProgressStore, ResumePrompt } from '@/features/reading-progress';
 
 const props = defineProps<{ work: Work }>();
 
+// Stores & State
+const progressStore = useReadingProgressStore();
 const currentChapter = ref(1);
+const showResumePrompt = ref(false);
+const savedProgressState = ref<{ chapter: number; scroll: number } | null>(null);
+
+// Refs for DOM
 const viewerContentRef = ref<InstanceType<typeof ViewerContent> | null>(null);
 const contentElement = ref<HTMLElement | null>(null);
 
-onMounted(() => {
-  if (viewerContentRef.value) {
-    contentElement.value = viewerContentRef.value.contentElement;
-  }
-});
+// --- SCROLL TRACKING LOGIC ---
+let scrollTimeout: number | null = null;
+
+const handleScroll = () => {
+  if (scrollTimeout) return;
+
+  // Throttle saving (сохраняем не чаще чем раз в 500мс)
+  scrollTimeout = window.setTimeout(() => {
+    // Сохраняем текущую позицию и главу
+    progressStore.saveProgress(
+      props.work.slug,
+      currentChapter.value,
+      window.scrollY
+    );
+    scrollTimeout = null;
+  }, 500);
+};
+
+// --- NAVIGATION LOGIC ---
 
 const nextChapter = () => {
   if (currentChapter.value < props.work.stats.chapters) {
     currentChapter.value++;
+    // При смене главы скролл сбрасывается на 0
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Принудительно сохраняем новую главу с 0 скроллом
+    progressStore.saveProgress(props.work.slug, currentChapter.value, 0);
   }
 };
 
@@ -33,8 +58,68 @@ const prevChapter = () => {
   if (currentChapter.value > 1) {
     currentChapter.value--;
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    progressStore.saveProgress(props.work.slug, currentChapter.value, 0);
   }
 };
+
+// --- RESUME LOGIC ---
+
+const checkProgress = () => {
+  const saved = progressStore.getProgress(props.work.slug);
+
+  // Если есть сохранение И (глава > 1 ИЛИ скролл > 200px)
+  if (saved && (saved.chapter > 1 || saved.scroll > 200)) {
+    savedProgressState.value = saved;
+    showResumePrompt.value = true;
+
+    // Авто-скрытие плашки через 10 секунд
+    setTimeout(() => {
+      showResumePrompt.value = false;
+    }, 10000);
+  }
+};
+
+const resumeReading = async () => {
+  if (!savedProgressState.value) return;
+
+  const { chapter, scroll } = savedProgressState.value;
+
+  // 1. Устанавливаем главу
+  currentChapter.value = chapter;
+  showResumePrompt.value = false;
+
+  // 2. Ждем ре-рендера контента
+  await nextTick();
+
+  // 3. Восстанавливаем скролл
+  window.scrollTo({
+    top: scroll,
+    behavior: 'smooth'
+  });
+};
+
+const closePrompt = () => {
+  showResumePrompt.value = false;
+};
+
+// --- LIFECYCLE ---
+
+onMounted(() => {
+  if (viewerContentRef.value) {
+    contentElement.value = viewerContentRef.value.contentElement;
+  }
+
+  // Проверяем наличие сохранений
+  checkProgress();
+
+  // Начинаем слушать скролл
+  window.addEventListener('scroll', handleScroll, { passive: true });
+});
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll);
+  if (scrollTimeout) clearTimeout(scrollTimeout);
+});
 </script>
 
 <template>
@@ -47,8 +132,7 @@ const prevChapter = () => {
         <ViewerControls
           :current-chapter="currentChapter"
           :total-chapters="work.stats.chapters"
-          @next="nextChapter"
-          @prev="prevChapter"
+          @next="nextChapter" @prev="prevChapter"
           class="!mb-0"
         />
       </div>
@@ -65,6 +149,13 @@ const prevChapter = () => {
     <ViewerContent
       ref="viewerContentRef"
       :content="work.content || '<p>Data corrupted. No content available.</p>'"
+    />
+
+    <!-- НОВЫЙ КОМПОНЕНТ: Подсказка о восстановлении -->
+    <ResumePrompt
+      :is-visible="showResumePrompt"
+      :chapter="savedProgressState?.chapter || 1"
+      @resume="resumeReading" @close="closePrompt"
     />
   </div>
 </template>

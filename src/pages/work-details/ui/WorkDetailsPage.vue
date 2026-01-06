@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRoute, RouterLink } from 'vue-router';
-import { works } from ' @/entities/work';
-import BaseButton from ' @/shared/ui/BaseButton.vue';
+import { works } from '@/entities/work';
+import BaseButton from '@/shared/ui/BaseButton.vue';
 // Импортируем локальные компоненты вместо виджетов
 import WorkViewer from './WorkViewer.vue';
 import ViewerSkeleton from './parts/ViewerSkeleton.vue';
