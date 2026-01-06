@@ -27,6 +27,9 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
   // Checkmark on black circle -> 'black'
   const theme = ref<Theme>(getSaved('theme', 'black')); // Было 'dark' -> Стало 'black'
 
+  // НОВОЕ СОСТОЯНИЕ: Focus Mode (не сохраняем в LS)
+  const isFocusMode = ref(false);
+
   // --- ACTIONS ---
 
   const increaseFont = () => { if (fontSize.value < 32) fontSize.value += 2; };
@@ -43,6 +46,10 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
   const setLineHeight = (height: number) => { lineHeight.value = height; };
 
   const setTheme = (newTheme: Theme) => { theme.value = newTheme; };
+
+  // Управление Focus Mode
+  const setFocusMode = (value: boolean) => { isFocusMode.value = value; };
+  const toggleFocusMode = () => { isFocusMode.value = !isFocusMode.value; };
 
   // --- WATCHER ---
   watch([fontSize, fontWeight, letterSpacing, fontFamily, pageWidth, lineHeight, theme], () => {
@@ -63,6 +70,7 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
     pageWidth,
     lineHeight,
     theme,
+    isFocusMode, // Экспорт
     increaseFont,
     decreaseFont,
     increaseWeight,
@@ -72,6 +80,8 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
     setFontFamily,
     setPageWidth,
     setLineHeight,
-    setTheme
+    setTheme,
+    setFocusMode, // Экспорт
+    toggleFocusMode // Экспорт
   };
 });
