@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 // Исправление: Импорт через Public API ( @/entities/work), а не напрямую из api/mockData
 import { works } from '@/entities/work';
 import WorkCard from '@/entities/work/ui/WorkCard.vue';
 import { RouterLink } from 'vue-router';
+import { useWorkFilterStore } from '@/features/filter-works';
+
+const router = useRouter();
+const filterStore = useWorkFilterStore();
 
 const latestWorks = computed(() => {
   return works
@@ -11,6 +16,12 @@ const latestWorks = computed(() => {
     .sort((a, b) => new Date(b.stats.date).getTime() - new Date(a.stats.date).getTime())
     .slice(0, 3);
 });
+
+// Обработчик: устанавливаем фильтр и переходим в каталог
+const handleTagClick = (tag: string) => {
+  filterStore.searchByTag(tag);
+  router.push('/works');
+};
 </script>
 
 <template>
@@ -31,6 +42,7 @@ const latestWorks = computed(() => {
         :key="work.id"
         :work="work"
         class="h-full"
+        @clickTag="handleTagClick"
       />
     </div>
 

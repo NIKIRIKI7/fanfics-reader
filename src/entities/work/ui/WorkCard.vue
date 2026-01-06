@@ -2,10 +2,16 @@
 import type { Work } from '../model/types';
 import BaseTag from '@/shared/ui/BaseTag.vue';
 import { RouterLink } from 'vue-router';
-// Импортируем функцию расчета (можно через относительный путь внутри слайса)
-import { getReadingTime } from '../lib/readingTime';
+import { getReadingTime } from '@/entities/work';
+
+// Удален импорт useWorkFilterStore (нарушение FSD)
 
 defineProps<{ work: Work }>();
+
+// Определяем событие, которое карточка посылает родителю
+defineEmits<{
+  (e: 'clickTag', tag: string): void
+}>();
 </script>
 
 <template>
@@ -91,9 +97,15 @@ defineProps<{ work: Work }>();
       </div>
 
       <!-- Tags -->
-      <div class="flex flex-wrap gap-2 mt-2 relative z-10">
-        <BaseTag v-for="tag in work.tags" :key="tag" :label="tag" />
-      </div>
+      <!-- Добавлен relative и z-20, чтобы клик проходил по кнопке, а не по ссылке карточки -->
+      <div class="flex flex-wrap gap-2 mt-2 relative z-20 pointer-events-auto">
+        <BaseTag
+          v-for="tag in work.tags"
+          :key="tag"
+          :label="tag"
+          @click.stop="$emit('clickTag', tag)"
+        />
+    </div>
     </div>
   </article>
 </template>

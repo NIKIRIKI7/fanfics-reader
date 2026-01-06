@@ -1,9 +1,20 @@
 <script setup lang="ts">
-// Импортируем из сущности через Public API
+import { useRouter } from 'vue-router';
 import { type Work, getReadingTime } from '@/entities/work';
 import BaseTag from '@/shared/ui/BaseTag.vue';
+import { useWorkFilterStore } from '@/features/filter-works';
 
 defineProps<{ work: Work }>();
+
+const router = useRouter();
+const filterStore = useWorkFilterStore();
+
+const handleTagClick = (tag: string) => {
+  // 1. Устанавливаем фильтр в сторе
+  filterStore.searchByTag(tag);
+  // 2. Редиректим пользователя в каталог
+  router.push({ name: 'works' });
+};
 </script>
 
 <template>
@@ -53,9 +64,15 @@ defineProps<{ work: Work }>();
       </span>
     </div>
 
-    <!-- Tags -->
+    <!-- Tags (Clickable) -->
     <div class="flex flex-wrap justify-center gap-2">
-      <BaseTag v-for="tag in work.tags" :key="tag" :label="tag" />
+      <BaseTag
+        v-for="tag in work.tags"
+        :key="tag"
+        :label="tag"
+        @click="handleTagClick(tag)"
+        title="Filter by this tag"
+      />
     </div>
   </header>
 </template>

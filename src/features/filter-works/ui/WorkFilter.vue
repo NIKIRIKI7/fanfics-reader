@@ -7,6 +7,7 @@ import FilterSearchBar from './parts/FilterSearchBar.vue';
 import FilterRating from './parts/FilterRating.vue';
 import FilterStatus from './parts/FilterStatus.vue';
 import FilterFandom from './parts/FilterFandom.vue';
+import FilterTags from './parts/FilterTags.vue'; // Импорт
 
 const store = useWorkFilterStore();
 const isAdvancedOpen = ref(false);
@@ -34,10 +35,12 @@ const closePanel = () => {
       <div v-if="isAdvancedOpen" class="bg-background-secondary/95 backdrop-blur-xl border border-border rounded-xl p-6 shadow-xl overflow-hidden">
 
         <!-- Grid of Filter Groups -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Изменили grid-cols для лучшего отображения 4 колонок -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <FilterRating />
           <FilterStatus />
           <FilterFandom />
+          <FilterTags /> <!-- Новый компонент -->
         </div>
 
         <!-- Footer Actions -->
@@ -60,7 +63,7 @@ const closePanel = () => {
 .slide-enter-active,
 .slide-leave-active {
   transition: all 0.3s ease-out;
-  max-height: 500px;
+  max-height: 800px; /* Увеличили макс. высоту, так как контента стало больше */
   opacity: 1;
 }
 

@@ -7,7 +7,9 @@ import { WorkCatalog } from '@/widgets/work-catalog';
 const store = useWorkFilterStore();
 
 onMounted(() => {
-  store.setShowArchived(true); // Показываем только Archive
+  // Сбрасываем фильтры, чтобы архив открылся "чистым"
+  store.resetFilters();
+  store.setShowArchived(true);
 });
 </script>
 

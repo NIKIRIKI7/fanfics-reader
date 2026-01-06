@@ -11,12 +11,12 @@ export const useWorkFilterStore = defineStore('workFilter', () => {
   const activeType = ref<WorkType | 'All'>('All');
   const sortBy = ref<'date' | 'words'>('date');
 
-  // Advanced Filters
+  // Filters
   const selectedRatings = ref<string[]>([]);
   const selectedStatuses = ref<WorkStatus[]>([]);
   const selectedFandoms = ref<string[]>([]);
+  const selectedTags = ref<string[]>([]); // НОВОЕ: Массив выбранных тегов
 
-  // Context
   const showArchived = ref(false);
 
   // === ACTIONS ===
@@ -24,9 +24,10 @@ export const useWorkFilterStore = defineStore('workFilter', () => {
     activeType.value = type;
   };
 
+  // ИЗМЕНЕНИЕ 1: Убрали resetFilters() отсюда.
+  // Теперь это просто переключатель режима.
   const setShowArchived = (value: boolean) => {
     showArchived.value = value;
-    resetFilters();
   };
 
   const toggleRating = (rating: string) => {
@@ -53,21 +54,45 @@ export const useWorkFilterStore = defineStore('workFilter', () => {
     }
   };
 
+  // НОВОЕ: Переключение тега
+  const toggleTag = (tag: string) => {
+    if (selectedTags.value.includes(tag)) {
+      selectedTags.value = selectedTags.value.filter(t => t !== tag);
+    } else {
+      selectedTags.value.push(tag);
+    }
+  };
+
   const resetFilters = () => {
     activeType.value = 'All';
     searchQuery.value = '';
     selectedRatings.value = [];
     selectedStatuses.value = [];
     selectedFandoms.value = [];
+    selectedTags.value = []; // Сброс тегов
+  };
+
+  // ИЗМЕНЕНИЕ 2: При поиске по тегу убеждаемся, что мы не в архиве
+  const searchByTag = (tag: string) => {
+    resetFilters();
+    selectedTags.value.push(tag);
+    showArchived.value = false; // Принудительно выходим из архива, чтобы видеть результаты
   };
 
   // === GETTERS ===
   const availableFandoms = computed(() => {
     const fandoms = new Set<string>();
-    works.forEach(w => {
-      if (w.fandom) fandoms.add(w.fandom);
-    });
+    works.forEach(w => { if (w.fandom) fandoms.add(w.fandom); });
     return Array.from(fandoms);
+  });
+
+  // НОВОЕ: Получаем список всех уникальных тегов
+  const availableTags = computed(() => {
+    const tags = new Set<string>();
+    works.forEach(w => {
+      w.tags.forEach(tag => tags.add(tag));
+    });
+    return Array.from(tags).sort();
   });
 
   const filteredWorks = computed(() => {
@@ -87,7 +112,6 @@ export const useWorkFilterStore = defineStore('workFilter', () => {
       const query = searchQuery.value.toLowerCase();
       result = result.filter(work =>
         work.title.toLowerCase().includes(query) ||
-        work.tags.some(tag => tag.toLowerCase().includes(query)) ||
         (work.fandom && work.fandom.toLowerCase().includes(query))
       );
     }
@@ -104,6 +128,14 @@ export const useWorkFilterStore = defineStore('workFilter', () => {
       result = result.filter(work => work.fandom && selectedFandoms.value.includes(work.fandom));
     }
 
+    // НОВОЕ: Фильтрация по выбранным тегам
+    if (selectedTags.value.length > 0) {
+      // Работа должна содержать ВСЕ выбранные теги (строгая фильтрация)
+      result = result.filter(work =>
+        selectedTags.value.every(selectedTag => work.tags.includes(selectedTag))
+      );
+    }
+
     return [...result].sort((a, b) => {
       if (sortBy.value === 'date') {
         return new Date(b.stats.date).getTime() - new Date(a.stats.date).getTime();
@@ -113,7 +145,10 @@ export const useWorkFilterStore = defineStore('workFilter', () => {
   });
 
   const activeFiltersCount = computed(() => {
-    return selectedRatings.value.length + selectedStatuses.value.length + selectedFandoms.value.length;
+    return selectedRatings.value.length +
+           selectedStatuses.value.length +
+           selectedFandoms.value.length +
+           selectedTags.value.length;
   });
 
   return {
@@ -124,15 +159,19 @@ export const useWorkFilterStore = defineStore('workFilter', () => {
     selectedRatings,
     selectedStatuses,
     selectedFandoms,
+    selectedTags,      // export
     availableFandoms,
+    availableTags,     // export
     activeFiltersCount,
-    availableRatings, // Экспортируем константу
+    availableRatings,
     setType,
     setShowArchived,
     toggleRating,
     toggleStatus,
     toggleFandom,
+    toggleTag,         // export
     resetFilters,
+    searchByTag,
     filteredWorks
   };
 });

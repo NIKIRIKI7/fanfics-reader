@@ -6,10 +6,13 @@ import { storeToRefs } from 'pinia';
 
 const store = useWorkFilterStore();
 const { filteredWorks } = storeToRefs(store);
-
-// Ставим false, так как данные локальные и доступны мгновенно.
-// При подключении API здесь будет true, а в fetch() переключится на false.
 const isLoading = ref(false);
+
+const handleTagClick = (tag: string) => {
+  store.searchByTag(tag);
+  // Автоскролл к началу списка при фильтрации
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
 </script>
 
 <template>
@@ -28,11 +31,18 @@ const isLoading = ref(false);
         v-for="work in filteredWorks"
         :key="work.id"
         :work="work"
+        @clickTag="handleTagClick"
       />
 
       <!-- Empty State -->
       <div v-if="filteredWorks.length === 0" class="py-12 text-center border border-dashed border-border rounded-xl">
         <p class="text-text-muted font-display italic text-lg">Signal lost. No records match your parameters.</p>
+        <button
+          @click="store.resetFilters"
+          class="mt-4 text-accent hover:underline text-sm font-bold"
+        >
+          Reset Filters
+        </button>
       </div>
     </div>
   </section>
