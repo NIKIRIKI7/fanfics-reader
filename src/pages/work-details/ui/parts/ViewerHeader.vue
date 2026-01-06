@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { Work } from ' @/entities/work';
+// Импортируем из сущности через Public API
+import { type Work, getReadingTime } from '@/entities/work';
 import BaseTag from '@/shared/ui/BaseTag.vue';
 
 defineProps<{ work: Work }>();
@@ -37,10 +38,19 @@ defineProps<{ work: Work }>();
     <!-- Stats -->
     <div class="flex flex-wrap items-center justify-center gap-3 text-text-secondary font-sans text-sm mb-6">
       <span class="font-bold text-text-primary">{{ work.author }}</span>
+
       <span class="w-1 h-1 rounded-full bg-border"></span>
       <span>{{ work.stats.date }}</span>
+
       <span class="w-1 h-1 rounded-full bg-border"></span>
       <span>{{ work.stats.words.toLocaleString() }} words</span>
+
+      <!-- НОВОЕ: Время чтения -->
+      <span class="w-1 h-1 rounded-full bg-border"></span>
+      <span class="flex items-center gap-1 text-text-primary font-medium">
+         <span class="material-symbols-outlined text-[16px]">schedule</span>
+         {{ getReadingTime(work.stats.words) }}
+      </span>
     </div>
 
     <!-- Tags -->

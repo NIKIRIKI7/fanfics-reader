@@ -2,6 +2,8 @@
 import type { Work } from '../model/types';
 import BaseTag from '@/shared/ui/BaseTag.vue';
 import { RouterLink } from 'vue-router';
+// Импортируем функцию расчета (можно через относительный путь внутри слайса)
+import { getReadingTime } from '../lib/readingTime';
 
 defineProps<{ work: Work }>();
 </script>
@@ -26,17 +28,27 @@ defineProps<{ work: Work }>();
     <!-- Content Block -->
     <div class="flex-1 flex flex-col justify-between">
       <div>
-        <!-- Meta Info (Date, Words, Status) -->
+        <!-- Meta Info (Date, Words, Time, Status) -->
         <div class="flex flex-wrap items-center gap-x-3 text-xs text-text-muted font-sans mb-2">
           <span class="flex items-center gap-1">
             <span class="material-symbols-outlined text-[14px]">calendar_today</span>
             {{ work.stats.date }}
           </span>
+
           <span class="w-1 h-1 rounded-full bg-border"></span>
+
           <span class="flex items-center gap-1">
             <span class="material-symbols-outlined text-[14px]">format_align_left</span>
             {{ work.stats.words.toLocaleString() }} words
           </span>
+
+          <!-- НОВОЕ: Время чтения -->
+          <span class="w-1 h-1 rounded-full bg-border"></span>
+          <span class="flex items-center gap-1 text-text-secondary font-medium">
+             <span class="material-symbols-outlined text-[14px]">schedule</span>
+             {{ getReadingTime(work.stats.words) }}
+          </span>
+
           <span class="w-1 h-1 rounded-full bg-border"></span>
           <span class="text-text-primary font-bold">{{ work.stats.status }}</span>
         </div>
