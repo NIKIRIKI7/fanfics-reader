@@ -2,6 +2,7 @@
 import { computed } from 'vue'; // ref больше не нужен для открытия
 import { useReadingSettingsStore, type Theme } from '../model/store';
 import { storeToRefs } from 'pinia';
+import { onEnterScale, onLeaveScale } from '@/shared/lib/gsapTransitions';
 
 const props = withDefaults(defineProps<{
   placement?: 'bottom' | 'top'
@@ -54,7 +55,11 @@ const panelPositionClasses = computed(() => {
       <span class="hidden sm:inline">Appearance</span>
     </button>
 
-    <transition name="fade-scale">
+    <!-- Заменили <transition name="fade-scale"> на хуки GSAP -->
+    <transition
+      :css="false"
+      @enter="onEnterScale" @leave="onLeaveScale"
+    >
       <!-- ИЗМЕНЕНИЕ: v-if зависит от isSettingsOpen -->
       <div
         v-if="isSettingsOpen"
@@ -165,9 +170,6 @@ const panelPositionClasses = computed(() => {
 </template>
 
 <style scoped>
-.fade-scale-enter-active,
-.fade-scale-leave-active { transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
-.fade-scale-enter-from, .fade-scale-leave-to { opacity: 0; transform: scale(0.95); }
 .custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 4px; }
 </style>

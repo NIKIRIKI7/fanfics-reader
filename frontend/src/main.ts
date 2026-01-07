@@ -2,6 +2,11 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import App from './App.vue';
 import router from './app/router';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+// Register GSAP plugins globally
+gsap.registerPlugin(ScrollTrigger);
 
 // 1. Иконки (из node_modules)
 // Подключаем именно Outlined версию, как в дизайне
@@ -12,8 +17,6 @@ import './app/styles/fonts.css';
 
 // 3. Основные стили (Tailwind)
 import './app/styles/main.css';
-// 4. Анимации
-import './app/styles/animation.css';
 
 const app = createApp(App);
 app.use(createPinia());

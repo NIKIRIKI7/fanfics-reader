@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import html2canvas from 'html2canvas';
 import type { Work } from '@/entities/work';
+import { onEnterFade, onLeaveFade } from '@/shared/lib/gsapTransitions';
 
 const props = defineProps<{
   work: Work;
@@ -56,7 +57,10 @@ const downloadImage = async () => {
 
 <template>
   <Teleport to="body">
-    <transition name="fade">
+    <transition
+      :css="false"
+      @enter="onEnterFade" @leave="onLeaveFade"
+    >
       <div v-if="isOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" @click="$emit('close')"></div>
 

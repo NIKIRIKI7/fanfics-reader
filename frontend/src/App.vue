@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router';
 import { TheNavbar, TheFooter } from '@/widgets/layout';
-// Импортируем стор, чтобы следить за состоянием
 import { useReadingSettingsStore } from '@/features/customize-reading';
+import { onEnterFade, onLeaveFade, onEnterSlideDown, onLeaveSlideDown } from '@/shared/lib/gsapTransitions';
 
 const store = useReadingSettingsStore();
 </script>
 
 <template>
   <div class="flex flex-col min-h-screen">
-    <!-- Скрываем Navbar в режиме фокуса -->
-    <transition name="slide-down">
+    <!-- Navbar с GSAP анимацией -->
+    <transition
+      :css="false"
+      @enter="onEnterSlideDown" @leave="onLeaveSlideDown"
+    >
       <div v-show="!store.isFocusMode" class="z-50 relative">
         <TheNavbar />
       </div>
@@ -18,23 +21,22 @@ const store = useReadingSettingsStore();
 
     <main class="flex-1">
       <RouterView v-slot="{ Component }">
-        <transition name="fade" mode="out-in">
+        <transition
+          :css="false"
+          mode="out-in"
+          @enter="onEnterFade" @leave="onLeaveFade"
+        >
           <component :is="Component" />
         </transition>
       </RouterView>
     </main>
 
-    <!-- Скрываем Footer в режиме фокуса -->
-    <transition name="fade">
+    <!-- Footer с GSAP анимацией -->
+    <transition
+      :css="false"
+      @enter="onEnterFade" @leave="onLeaveFade"
+    >
       <TheFooter v-show="!store.isFocusMode" />
     </transition>
   </div>
 </template>
-
-<style>
-.fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
-
-.slide-down-enter-active, .slide-down-leave-active { transition: transform 0.3s ease, opacity 0.3s ease; }
-.slide-down-enter-from, .slide-down-leave-to { transform: translateY(-100%); opacity: 0; }
-</style>

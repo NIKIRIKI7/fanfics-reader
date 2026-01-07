@@ -16,6 +16,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "gsap": "^3.14.2",
     "html2canvas": "^1.4.1",
     "material-symbols": "^0.40.2",
     "pinia": "^3.0.3",

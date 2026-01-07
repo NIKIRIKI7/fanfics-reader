@@ -4,16 +4,44 @@ import { WorkCard } from '@/entities/work';
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useWorkFilterStore } from '@/features/filter-works';
+import { onMounted, ref, nextTick } from 'vue';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const historyStore = useViewHistoryStore();
 const { history } = storeToRefs(historyStore);
 const router = useRouter();
 const filterStore = useWorkFilterStore();
+const containerRef = ref<HTMLElement | null>(null);
 
 const handleTagClick = (tag: string) => {
   filterStore.searchByTag(tag);
   router.push('/works');
 };
+
+onMounted(async () => {
+  await nextTick();
+  if (containerRef.value) {
+    const items = containerRef.value.querySelectorAll('.history-item');
+    gsap.set(items, { opacity: 0, y: 20 });
+
+    ScrollTrigger.batch(items, {
+      start: 'top 95%',
+      onEnter: (batch) => {
+        gsap.to(batch, {
+          opacity: 1,
+          y: 0,
+          stagger: 0.1,
+          duration: 0.5,
+          ease: 'power2.out'
+        });
+      },
+      once: true
+    });
+  }
+});
 </script>
 
 <template>
@@ -35,14 +63,13 @@ const handleTagClick = (tag: string) => {
     </div>
 
     <!-- Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 history-grid">
+    <div ref="containerRef" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 history-grid">
       <WorkCard
-        v-for="(work, index) in history"
+        v-for="work in history"
         :key="work.id"
         :work="work"
         @clickTag="handleTagClick"
-        class="h-full animate-appear"
-        :style="{ '--animate-delay': `${index * 75}ms` }"
+        class="h-full history-item"
       />
     </div>
   </section>
@@ -62,20 +89,9 @@ const handleTagClick = (tag: string) => {
   margin-bottom: 1rem;
 }
 
-.history-grid :deep(article p.line-clamp-2),
-.history-grid :deep(article p.line-clamp-3) {
-  -webkit-line-clamp: 2 !important;
-  font-size: 0.85rem;
-  opacity: 0.7;
-}
-
 .history-grid :deep(article h3) {
   font-size: 1.25rem;
   margin-bottom: 0.5rem;
 }
 
-.history-grid :deep(article .mt-2) {
-  margin-top: auto !important;
-  padding-top: 1rem;
-}
 </style>

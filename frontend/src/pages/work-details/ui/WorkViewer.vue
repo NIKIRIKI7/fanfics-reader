@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick } from 'vue';
 import type { Work } from '@/entities/work';
 import ViewerHeader from './parts/ViewerHeader.vue';
 import ViewerControls from './parts/ViewerControls.vue';
 import ViewerContent from './parts/ViewerContent.vue';
 import ReadingProgress from './parts/ReadingProgress.vue';
-import ChapterListModal from './parts/ChapterListModal.vue'; // Импорт нового компонента
+import ChapterListModal from './parts/ChapterListModal.vue';
 import { ReaderSettings, useReadingSettingsStore } from '@/features/customize-reading';
 import { useReadingProgressStore, ResumePrompt } from '@/features/reading-progress';
 import { useViewHistoryStore } from '@/features/view-history';
 import { ShareButton } from '@/features/share-work';
 import { storeToRefs } from 'pinia';
+import { onEnterFade, onLeaveFade, onEnterSlideUp, onLeaveSlideUp } from '@/shared/lib/gsapTransitions';
 
 const props = defineProps<{ work: Work }>();
+
 const progressStore = useReadingProgressStore();
 const settingsStore = useReadingSettingsStore();
 const historyStore = useViewHistoryStore();
@@ -20,23 +22,26 @@ const { isFocusMode } = storeToRefs(settingsStore);
 
 const currentChapter = ref(1);
 const showResumePrompt = ref(false);
-const isChapterListOpen = ref(false); // Состояние для шторки
+const isChapterListOpen = ref(false);
 const savedProgressState = ref<{ chapter: number; scroll: number } | null>(null);
+
 const viewerContentRef = ref<InstanceType<typeof ViewerContent> | null>(null);
 const contentElement = ref<HTMLElement | null>(null);
 
 let scrollTimeout: number | null = null;
 
-// --- Helper: Scroll to Text Start ---
 const scrollToContentStart = () => {
+  if (viewerContentRef.value) {
+    contentElement.value = viewerContentRef.value.contentElement;
+  }
+
   if (contentElement.value) {
     const rect = contentElement.value.getBoundingClientRect();
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
     const absoluteTop = rect.top + scrollTop;
 
-    // Скролл с учетом небольшого отступа
     window.scrollTo({
-      top: absoluteTop - 80,
+      top: absoluteTop - 100,
       behavior: 'instant'
     });
   } else {
@@ -44,7 +49,6 @@ const scrollToContentStart = () => {
   }
 };
 
-// --- Scroll & Progress Logic ---
 const handleScroll = () => {
   if (scrollTimeout) return;
   scrollTimeout = window.setTimeout(() => {
@@ -53,38 +57,38 @@ const handleScroll = () => {
   }, 500);
 };
 
-// --- Navigation Logic ---
-const nextChapter = () => {
+const nextChapter = async () => {
   if (currentChapter.value < props.work.stats.chapters) {
     currentChapter.value++;
+    await nextTick();
     scrollToContentStart();
     progressStore.saveProgress(props.work.slug, currentChapter.value, 0);
   }
 };
 
-const prevChapter = () => {
+const prevChapter = async () => {
   if (currentChapter.value > 1) {
     currentChapter.value--;
+    await nextTick();
     scrollToContentStart();
     progressStore.saveProgress(props.work.slug, currentChapter.value, 0);
   }
 };
 
-// --- Chapter List Logic (New) ---
 const toggleChapterList = () => {
   isChapterListOpen.value = !isChapterListOpen.value;
 };
 
-const selectChapter = (chapter: number) => {
+const selectChapter = async (chapter: number) => {
   if (chapter !== currentChapter.value) {
     currentChapter.value = chapter;
+    await nextTick();
     scrollToContentStart();
     progressStore.saveProgress(props.work.slug, currentChapter.value, 0);
   }
   isChapterListOpen.value = false;
 };
 
-// --- Keyboard Shortcuts ---
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
@@ -111,21 +115,28 @@ const handleKeydown = (e: KeyboardEvent) => {
   }
 };
 
-// --- Swipe Logic ---
 const touchStartX = ref(0);
 const touchStartY = ref(0);
 const touchEndX = ref(0);
 const touchEndY = ref(0);
 
+// ИСПРАВЛЕНИЕ: Используем переменную touch и проверяем её
 const handleTouchStart = (e: TouchEvent) => {
-  touchStartX.value = e.changedTouches[0].screenX;
-  touchStartY.value = e.changedTouches[0].screenY;
+  const touch = e.changedTouches[0];
+  if (touch) {
+    touchStartX.value = touch.screenX;
+    touchStartY.value = touch.screenY;
+  }
 };
 
+// ИСПРАВЛЕНИЕ: Аналогично для touchEnd
 const handleTouchEnd = (e: TouchEvent) => {
-  touchEndX.value = e.changedTouches[0].screenX;
-  touchEndY.value = e.changedTouches[0].screenY;
-  handleSwipe();
+  const touch = e.changedTouches[0];
+  if (touch) {
+    touchEndX.value = touch.screenX;
+    touchEndY.value = touch.screenY;
+    handleSwipe();
+  }
 };
 
 const handleSwipe = () => {
@@ -140,7 +151,6 @@ const handleSwipe = () => {
   }
 };
 
-// --- Resume Logic ---
 const checkProgress = () => {
   const saved = progressStore.getProgress(props.work.slug);
   if (saved && (saved.chapter > 1 || saved.scroll > 200)) {
@@ -155,6 +165,9 @@ const resumeReading = async () => {
   const { chapter, scroll } = savedProgressState.value;
   currentChapter.value = chapter;
   showResumePrompt.value = false;
+
+  await nextTick();
+
   setTimeout(() => {
     window.scrollTo({ top: scroll, behavior: 'instant' });
   }, 50);
@@ -162,9 +175,9 @@ const resumeReading = async () => {
 
 const closePrompt = () => { showResumePrompt.value = false; };
 
-// --- Lifecycle ---
 onMounted(() => {
   if (viewerContentRef.value) contentElement.value = viewerContentRef.value.contentElement;
+
   checkProgress();
   historyStore.addWork(props.work);
 
@@ -181,15 +194,16 @@ onUnmounted(() => {
   window.removeEventListener('touchend', handleTouchEnd);
 
   if (scrollTimeout) clearTimeout(scrollTimeout);
+
   settingsStore.setFocusMode(false);
   settingsStore.setSettingsOpen(false);
 });
 </script>
 
 <template>
-  <div class="animate-in fade-in duration-500 relative min-h-screen">
+  <div class="relative min-h-screen">
     <!-- Exit Focus Mode -->
-    <transition name="fade">
+    <transition :css="false" @enter="onEnterFade" @leave="onLeaveFade">
       <button
         v-if="isFocusMode"
         @click="settingsStore.setFocusMode(false)"
@@ -202,22 +216,20 @@ onUnmounted(() => {
 
     <ReadingProgress :target-element="contentElement" />
 
-    <transition name="fade">
+    <transition :css="false" @enter="onEnterFade" @leave="onLeaveFade">
       <div v-show="!isFocusMode">
         <ViewerHeader :work="work" />
       </div>
     </transition>
 
-    <transition name="slide-up">
+    <!-- Используем SlideUp для контролов -->
+    <transition :css="false" @enter="onEnterSlideUp" @leave="onLeaveSlideUp">
       <div v-show="!isFocusMode" class="flex gap-4 items-start justify-between mb-8 relative z-20">
         <div class="flex-1 max-w-2xl mx-auto w-full">
-          <!-- Контролы теперь обрабатывают toggle-list -->
           <ViewerControls
             :current-chapter="currentChapter"
             :total-chapters="work.stats.chapters"
-            @next="nextChapter"
-            @prev="prevChapter"
-            @toggle-list="toggleChapterList"
+            @next="nextChapter" @prev="prevChapter" @toggle-list="toggleChapterList"
             class="!mb-0"
           />
         </div>
@@ -237,7 +249,6 @@ onUnmounted(() => {
       </div>
     </transition>
 
-    <!-- Mobile Controls Float -->
     <div v-show="!isFocusMode" class="md:hidden fixed bottom-6 right-6 z-40 flex flex-col gap-3 items-end">
       <ShareButton :work="work" />
       <button
@@ -257,8 +268,7 @@ onUnmounted(() => {
     <ResumePrompt
       :is-visible="showResumePrompt"
       :chapter="savedProgressState?.chapter || 1"
-      @resume="resumeReading"
-      @close="closePrompt"
+      @resume="resumeReading" @close="closePrompt"
     />
 
     <ChapterListModal

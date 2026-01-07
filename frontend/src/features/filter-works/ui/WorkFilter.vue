@@ -6,6 +6,7 @@ import FilterRating from './parts/FilterRating.vue';
 import FilterStatus from './parts/FilterStatus.vue';
 import FilterFandom from './parts/FilterFandom.vue';
 import FilterTags from './parts/FilterTags.vue';
+import { onEnterAccordion, onLeaveAccordion } from '@/shared/lib/gsapTransitions';
 
 const store = useWorkFilterStore();
 const isAdvancedOpen = ref(false);
@@ -26,7 +27,10 @@ const closePanel = () => {
       @toggleAdvanced="toggleAdvanced"
     />
 
-    <transition name="slide">
+    <transition
+      :css="false"
+      @enter="onEnterAccordion" @leave="onLeaveAccordion"
+    >
       <div
         v-if="isAdvancedOpen"
         class="bg-background-secondary/95 backdrop-blur-xl border border-border rounded-xl p-6 shadow-xl overflow-hidden"
@@ -56,19 +60,3 @@ const closePanel = () => {
     </transition>
   </div>
 </template>
-
-<style scoped>
-.slide-enter-active,
-.slide-leave-active {
-  transition: all 0.3s ease-out;
-  max-height: 800px;
-  opacity: 1;
-}
-
-.slide-enter-from,
-.slide-leave-to {
-  max-height: 0;
-  opacity: 0;
-  transform: translateY(-10px);
-}
-</style>

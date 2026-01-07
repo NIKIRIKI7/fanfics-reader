@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { onEnterFade, onLeaveFade } from '@/shared/lib/gsapTransitions';
+import gsap from 'gsap';
+
 defineProps<{
   isOpen: boolean;
   currentChapter: number;
@@ -9,21 +12,39 @@ defineEmits<{
   (e: 'close'): void;
   (e: 'select', chapter: number): void;
 }>();
+
+// Custom transition for the sheet specifically
+const onEnterSheet = (el: Element, done: () => void) => {
+  gsap.fromTo(el,
+    { y: '100%' },
+    { y: '0%', duration: 0.4, ease: 'power3.out', onComplete: done }
+  );
+};
+
+const onLeaveSheet = (el: Element, done: () => void) => {
+  gsap.to(el, { y: '100%', duration: 0.3, ease: 'power3.in', onComplete: done });
+};
 </script>
 
 <template>
   <Teleport to="body">
-    <transition name="fade">
-      <!-- Backdrop -->
+    <!-- Backdrop -->
+    <transition
+      :css="false"
+      @enter="onEnterFade" @leave="onLeaveFade"
+    >
       <div
         v-if="isOpen"
         @click="$emit('close')"
-        class="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-opacity"
+        class="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm"
       ></div>
     </transition>
 
-    <transition name="slide-up">
-      <!-- Sheet -->
+    <!-- Sheet -->
+    <transition
+      :css="false"
+      @enter="onEnterSheet" @leave="onLeaveSheet"
+    >
       <div
         v-if="isOpen"
         class="fixed bottom-0 left-0 right-0 z-[70] bg-background-secondary border-t border-border rounded-t-2xl shadow-2xl max-h-[70vh] flex flex-col w-full max-w-2xl mx-auto"
@@ -66,24 +87,6 @@ defineEmits<{
 </template>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.slide-up-enter-active,
-.slide-up-leave-active {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.slide-up-enter-from,
-.slide-up-leave-to {
-  transform: translateY(100%);
-}
-
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
