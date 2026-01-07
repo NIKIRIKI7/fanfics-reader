@@ -263,6 +263,7 @@ onUnmounted(() => {
     <ViewerContent
       ref="viewerContentRef"
       :content="work.content || '<p>Data corrupted. No content available.</p>'"
+      :soundtracks="work.soundtracks"
     />
 
     <ResumePrompt

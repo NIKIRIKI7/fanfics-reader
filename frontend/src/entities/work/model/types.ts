@@ -9,6 +9,21 @@ export interface WorkStats {
   status: WorkStatus;
 }
 
+// Новые интерфейсы для музыки
+export interface Track {
+  id: string;
+  title: string;
+  artist: string;
+  url: string; // Ссылка на mp3 файл
+  duration?: string;
+}
+
+export interface SceneSoundtrack {
+  id: string; // ID на который мы ссылаемся в тексте
+  title?: string; // Опциональный заголовок (например, "Atmosphere: Rain")
+  tracks: Track[];
+}
+
 export interface Work {
   id: string;
   slug: string;
@@ -28,4 +43,5 @@ export interface Work {
   stats: WorkStats;
   // Added content field
   content?: string;
+  soundtracks?: SceneSoundtrack[]; // Добавляем массив плейлистов
 }
