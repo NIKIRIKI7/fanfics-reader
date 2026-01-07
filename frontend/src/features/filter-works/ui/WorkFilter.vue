@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useWorkFilterStore } from '../model/store';
-
-// Importing decomposed parts
 import FilterSearchBar from './parts/FilterSearchBar.vue';
 import FilterRating from './parts/FilterRating.vue';
 import FilterStatus from './parts/FilterStatus.vue';
 import FilterFandom from './parts/FilterFandom.vue';
-import FilterTags from './parts/FilterTags.vue'; // Импорт
+import FilterTags from './parts/FilterTags.vue';
 
 const store = useWorkFilterStore();
 const isAdvancedOpen = ref(false);
@@ -22,40 +20,40 @@ const closePanel = () => {
 </script>
 
 <template>
-  <div class="sticky top-20 z-40 flex flex-col gap-2 mb-10 transition-all duration-300">
-
-    <!-- Top Bar Component -->
+  <div class="flex flex-col gap-2 mb-10 transition-all duration-300">
     <FilterSearchBar
       :isAdvancedOpen="isAdvancedOpen"
       @toggleAdvanced="toggleAdvanced"
     />
 
-    <!-- Dropdown Panel -->
     <transition name="slide">
-      <div v-if="isAdvancedOpen" class="bg-background-secondary/95 backdrop-blur-xl border border-border rounded-xl p-6 shadow-xl overflow-hidden">
-
-        <!-- Grid of Filter Groups -->
-        <!-- Изменили grid-cols для лучшего отображения 4 колонок -->
+      <div
+        v-if="isAdvancedOpen"
+        class="bg-background-secondary/95 backdrop-blur-xl border border-border rounded-xl p-6 shadow-xl overflow-hidden"
+      >
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <FilterRating />
           <FilterStatus />
           <FilterFandom />
-          <FilterTags /> <!-- Новый компонент -->
+          <FilterTags />
         </div>
 
-        <!-- Footer Actions -->
         <div class="mt-6 pt-4 border-t border-border flex justify-between items-center">
-          <button @click="store.resetFilters" class="text-xs text-text-muted hover:text-red-500 transition-colors uppercase tracking-wider font-bold">
+          <button
+            @click="store.resetFilters"
+            class="text-xs text-text-muted hover:text-red-500 transition-colors uppercase tracking-wider font-bold"
+          >
             Reset All
           </button>
-          <button @click="closePanel" class="text-xs text-text-primary hover:underline uppercase tracking-wider font-bold">
+          <button
+            @click="closePanel"
+            class="text-xs text-text-primary hover:underline uppercase tracking-wider font-bold"
+          >
             Close Panel
           </button>
         </div>
-
       </div>
     </transition>
-
   </div>
 </template>
 
@@ -63,7 +61,7 @@ const closePanel = () => {
 .slide-enter-active,
 .slide-leave-active {
   transition: all 0.3s ease-out;
-  max-height: 800px; /* Увеличили макс. высоту, так как контента стало больше */
+  max-height: 800px;
   opacity: 1;
 }
 

@@ -1,39 +1,53 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import type { Work } from '@/entities/work';
-
-// Local Parts
 import ViewerHeader from './parts/ViewerHeader.vue';
 import ViewerControls from './parts/ViewerControls.vue';
 import ViewerContent from './parts/ViewerContent.vue';
 import ReadingProgress from './parts/ReadingProgress.vue';
-
-// Features
 import { ReaderSettings, useReadingSettingsStore } from '@/features/customize-reading';
 import { useReadingProgressStore, ResumePrompt } from '@/features/reading-progress';
-import { useViewHistoryStore } from '@/features/view-history'; // Импорт фичи истории
-import { ShareButton } from '@/features/share-work'; // Импорт фичи шеринга
+import { useViewHistoryStore } from '@/features/view-history';
+import { ShareButton } from '@/features/share-work';
 import { storeToRefs } from 'pinia';
 
 const props = defineProps<{ work: Work }>();
-
-// Stores
 const progressStore = useReadingProgressStore();
 const settingsStore = useReadingSettingsStore();
-const historyStore = useViewHistoryStore(); // Инициализация стора истории
+const historyStore = useViewHistoryStore();
 const { isFocusMode } = storeToRefs(settingsStore);
 
-// State
 const currentChapter = ref(1);
 const showResumePrompt = ref(false);
 const savedProgressState = ref<{ chapter: number; scroll: number } | null>(null);
-
-// Refs
 const viewerContentRef = ref<InstanceType<typeof ViewerContent> | null>(null);
 const contentElement = ref<HTMLElement | null>(null);
 
-// Scroll Logic
 let scrollTimeout: number | null = null;
+
+// --- Helper: Scroll to Text Start ---
+const scrollToContentStart = () => {
+  if (contentElement.value) {
+    // Получаем позицию элемента с текстом относительно вьюпорта
+    const rect = contentElement.value.getBoundingClientRect();
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+
+    // Вычисляем абсолютную позицию на странице
+    const absoluteTop = rect.top + scrollTop;
+
+    // Скроллим к тексту минус 80px (чтобы захватить панель управления с номером главы)
+    // behavior: 'instant' убирает анимацию дергания
+    window.scrollTo({
+      top: absoluteTop - 80,
+      behavior: 'instant'
+    });
+  } else {
+    // Фолбек
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+};
+
+// --- Scroll & Progress Logic ---
 const handleScroll = () => {
   if (scrollTimeout) return;
   scrollTimeout = window.setTimeout(() => {
@@ -42,48 +56,39 @@ const handleScroll = () => {
   }, 500);
 };
 
-// Navigation
+// --- Navigation Logic ---
 const nextChapter = () => {
   if (currentChapter.value < props.work.stats.chapters) {
     currentChapter.value++;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToContentStart(); // Используем новый скролл
     progressStore.saveProgress(props.work.slug, currentChapter.value, 0);
   }
 };
+
 const prevChapter = () => {
   if (currentChapter.value > 1) {
     currentChapter.value--;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToContentStart(); // Используем новый скролл
     progressStore.saveProgress(props.work.slug, currentChapter.value, 0);
   }
 };
 
-// --- KEYBOARD CONTROL LOGIC ---
+// --- Keyboard Shortcuts ---
 const handleKeydown = (e: KeyboardEvent) => {
-  // Игнорируем нажатия, если фокус в инпуте
   if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
-  // 1. Стрелка влево - Предыдущая глава
   if (e.key === 'ArrowLeft') {
     prevChapter();
   }
-
-  // 2. Стрелка вправо - Следующая глава
   if (e.key === 'ArrowRight') {
     nextChapter();
   }
-
-  // 3. Клавиша M - Меню настроек
   if (e.key.toLowerCase() === 'm') {
     settingsStore.toggleSettings();
   }
-
-  // 4. НОВОЕ: Клавиша F - Focus Mode (Дзен режим)
   if (e.key.toLowerCase() === 'f') {
     settingsStore.toggleFocusMode();
   }
-
-  // 5. Escape - Выход из Focus Mode или закрытие меню
   if (e.key === 'Escape') {
     if (settingsStore.isSettingsOpen) {
       settingsStore.setSettingsOpen(false);
@@ -93,7 +98,42 @@ const handleKeydown = (e: KeyboardEvent) => {
   }
 };
 
-// Resume Logic
+// --- Swipe Logic (Mobile UX) ---
+const touchStartX = ref(0);
+const touchStartY = ref(0);
+const touchEndX = ref(0);
+const touchEndY = ref(0);
+
+const handleTouchStart = (e: TouchEvent) => {
+  touchStartX.value = e.changedTouches[0].screenX;
+  touchStartY.value = e.changedTouches[0].screenY;
+};
+
+const handleTouchEnd = (e: TouchEvent) => {
+  touchEndX.value = e.changedTouches[0].screenX;
+  touchEndY.value = e.changedTouches[0].screenY;
+  handleSwipe();
+};
+
+const handleSwipe = () => {
+  const diffX = touchStartX.value - touchEndX.value;
+  const diffY = touchStartY.value - touchEndY.value;
+
+  const minSwipeDistance = 50;
+  const maxVerticalDeviation = 100;
+
+  if (Math.abs(diffX) > minSwipeDistance && Math.abs(diffY) < maxVerticalDeviation) {
+    if (diffX > 0) {
+      // Свайп влево -> Следующая глава
+      nextChapter();
+    } else {
+      // Свайп вправо -> Предыдущая глава
+      prevChapter();
+    }
+  }
+};
+
+// --- Resume Logic ---
 const checkProgress = () => {
   const saved = progressStore.getProgress(props.work.slug);
   if (saved && (saved.chapter > 1 || saved.scroll > 200)) {
@@ -102,32 +142,41 @@ const checkProgress = () => {
     setTimeout(() => showResumePrompt.value = false, 10000);
   }
 };
+
 const resumeReading = async () => {
   if (!savedProgressState.value) return;
   const { chapter, scroll } = savedProgressState.value;
   currentChapter.value = chapter;
   showResumePrompt.value = false;
+
+  // Для восстановления позиции оставляем smooth или instant по желанию
+  // Обычно лучше восстанавливать туда, где был
   setTimeout(() => {
-    window.scrollTo({ top: scroll, behavior: 'smooth' });
+    window.scrollTo({ top: scroll, behavior: 'instant' });
   }, 50);
 };
+
 const closePrompt = () => { showResumePrompt.value = false; };
 
-// Lifecycle
+// --- Lifecycle ---
 onMounted(() => {
+  // Связываем ссылку на компонент с DOM элементом текста
   if (viewerContentRef.value) contentElement.value = viewerContentRef.value.contentElement;
   checkProgress();
-
-  // Добавляем работу в историю просмотров
   historyStore.addWork(props.work);
 
   window.addEventListener('scroll', handleScroll, { passive: true });
   window.addEventListener('keydown', handleKeydown);
+  window.addEventListener('touchstart', handleTouchStart, { passive: true });
+  window.addEventListener('touchend', handleTouchEnd, { passive: true });
 });
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
   window.removeEventListener('keydown', handleKeydown);
+  window.removeEventListener('touchstart', handleTouchStart);
+  window.removeEventListener('touchend', handleTouchEnd);
+
   if (scrollTimeout) clearTimeout(scrollTimeout);
   settingsStore.setFocusMode(false);
   settingsStore.setSettingsOpen(false);
@@ -136,7 +185,6 @@ onUnmounted(() => {
 
 <template>
   <div class="animate-in fade-in duration-500 relative min-h-screen">
-
     <!-- Кнопка выхода из Zen Mode -->
     <transition name="fade">
       <button
@@ -170,9 +218,7 @@ onUnmounted(() => {
         </div>
 
         <div class="pt-2 hidden md:flex items-center gap-2">
-          <!-- Новая кнопка Share -->
           <ShareButton :work="work" />
-
           <button
             @click="settingsStore.setFocusMode(true)"
             class="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background-primary text-text-muted hover:text-text-primary hover:border-text-muted transition-all text-xs uppercase font-bold tracking-wider shadow-sm"
@@ -186,6 +232,7 @@ onUnmounted(() => {
       </div>
     </transition>
 
+    <!-- Mobile Controls Float -->
     <div v-show="!isFocusMode" class="md:hidden fixed bottom-6 right-6 z-40 flex flex-col gap-3 items-end">
       <ShareButton :work="work" />
       <button
