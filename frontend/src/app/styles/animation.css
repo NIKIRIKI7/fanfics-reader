@@ -11,6 +11,20 @@
     animation-delay: var(--animate-delay);
     will-change: opacity, transform;
   }
+
+  /* Shimmer Effect for Skeletons */
+  .animate-shimmer {
+    /* Создаем градиент: Основной -> Светлый блик -> Основной */
+    background: linear-gradient(
+      90deg,
+      var(--bg-tertiary) 0%,
+      var(--bg-secondary) 50%,
+      var(--bg-tertiary) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+    will-change: background-position;
+  }
 }
 
 @keyframes appearUp {
@@ -21,5 +35,14 @@
   100% {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
   }
 }

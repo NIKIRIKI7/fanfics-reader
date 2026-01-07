@@ -16,7 +16,7 @@ withDefaults(defineProps<Props>(), {
 
 <template>
   <div
-    class="animate-pulse bg-background-tertiary/60 rounded-md"
+    class="animate-shimmer"
     :class="[
       variant === 'circle' ? 'rounded-full' : 'rounded-md',
       variant === 'text' ? 'h-4 my-1' : '',
