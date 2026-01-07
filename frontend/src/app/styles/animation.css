@@ -1,0 +1,25 @@
+@layer utilities {
+  .animate-appear {
+    /* Определяем переменные с дефолтными значениями прямо в классе */
+    --animate-duration: 0.6s;
+    --animate-delay: 0ms;
+    --animate-from-y: 1.25rem; /* 20px */
+
+    /* Применяем их */
+    opacity: 0;
+    animation: appearUp var(--animate-duration) cubic-bezier(0.21, 1.02, 0.48, 1) forwards;
+    animation-delay: var(--animate-delay);
+    will-change: opacity, transform;
+  }
+}
+
+@keyframes appearUp {
+  0% {
+    opacity: 0;
+    transform: translateY(var(--animate-from-y));
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

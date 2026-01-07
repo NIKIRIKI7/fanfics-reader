@@ -10,7 +10,6 @@ const isLoading = ref(false);
 
 const handleTagClick = (tag: string) => {
   store.searchByTag(tag);
-  // Автоскролл к началу списка при фильтрации
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 </script>
@@ -26,16 +25,21 @@ const handleTagClick = (tag: string) => {
     </div>
 
     <!-- Data State: Real Cards -->
-    <div v-else class="grid grid-cols-1 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div v-else class="grid grid-cols-1 gap-6">
       <WorkCard
-        v-for="work in filteredWorks"
+        v-for="(work, index) in filteredWorks"
         :key="work.id"
         :work="work"
+        class="animate-appear"
+        :style="{ '--animate-delay': `${index * 50}ms` }"
         @clickTag="handleTagClick"
       />
 
       <!-- Empty State -->
-      <div v-if="filteredWorks.length === 0" class="py-12 text-center border border-dashed border-border rounded-xl">
+      <div
+        v-if="filteredWorks.length === 0"
+        class="py-12 text-center border border-dashed border-border rounded-xl animate-appear"
+      >
         <p class="text-text-muted font-display italic text-lg">Signal lost. No records match your parameters.</p>
         <button
           @click="store.resetFilters"

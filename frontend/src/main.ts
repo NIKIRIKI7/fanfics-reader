@@ -12,6 +12,8 @@ import './app/styles/fonts.css';
 
 // 3. Основные стили (Tailwind)
 import './app/styles/main.css';
+// 4. Анимации
+import './app/styles/animation.css';
 
 const app = createApp(App);
 app.use(createPinia());

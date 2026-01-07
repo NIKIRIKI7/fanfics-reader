@@ -17,7 +17,7 @@ const handleTagClick = (tag: string) => {
 </script>
 
 <template>
-  <section v-if="history.length > 0" class="w-full animate-in fade-in duration-700">
+  <section v-if="history.length > 0" class="w-full">
     <!-- Header -->
     <div class="flex items-end justify-between mb-8 border-b border-border/50 pb-4">
       <div class="flex flex-col gap-1">
@@ -37,54 +37,45 @@ const handleTagClick = (tag: string) => {
     <!-- Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 history-grid">
       <WorkCard
-        v-for="work in history"
+        v-for="(work, index) in history"
         :key="work.id"
         :work="work"
         @clickTag="handleTagClick"
-        class="h-full"
+        class="h-full animate-appear"
+        :style="{ '--animate-delay': `${index * 75}ms` }"
       />
     </div>
   </section>
 </template>
 
 <style scoped>
-/*
-  ВАЖНО: Переопределяем стили WorkCard только внутри этого компонента.
-  Мы заставляем карточки быть вертикальными (картинка сверху, текст снизу)
-  независимо от ширины экрана. Это исправляет проблему сплющивания.
-*/
 .history-grid :deep(article) {
-  flex-direction: column !important; /* Всегда колонка */
+  flex-direction: column !important;
   height: 100%;
-  padding: 1rem; /* Чуть меньше паддинги */
-  background-color: rgba(var(--bg-tertiary), 0.3); /* Более прозрачный фон */
+  padding: 1rem;
+  background-color: rgba(var(--bg-tertiary), 0.3);
 }
 
-/* Настраиваем размер картинки */
 .history-grid :deep(article > div:first-child) {
   width: 100% !important;
-  height: 220px !important; /* Фиксированная высота обложки */
+  height: 220px !important;
   margin-bottom: 1rem;
 }
 
-/* Скрываем саммари (описание), чтобы карточки были компактными,
-   или ограничиваем его одной строкой */
 .history-grid :deep(article p.line-clamp-2),
 .history-grid :deep(article p.line-clamp-3) {
-  -webkit-line-clamp: 2 !important; /* Ограничиваем описание */
+  -webkit-line-clamp: 2 !important;
   font-size: 0.85rem;
   opacity: 0.7;
 }
 
-/* Уменьшаем размер заголовка */
 .history-grid :deep(article h3) {
-  font-size: 1.25rem; /* text-xl вместо 2xl */
+  font-size: 1.25rem;
   margin-bottom: 0.5rem;
 }
 
-/* Убираем лишние отступы у тегов */
 .history-grid :deep(article .mt-2) {
-  margin-top: auto !important; /* Теги прижимаем к низу */
+  margin-top: auto !important;
   padding-top: 1rem;
 }
 </style>
