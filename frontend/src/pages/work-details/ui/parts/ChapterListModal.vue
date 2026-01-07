@@ -1,0 +1,94 @@
+<script setup lang="ts">
+defineProps<{
+  isOpen: boolean;
+  currentChapter: number;
+  totalChapters: number;
+}>();
+
+defineEmits<{
+  (e: 'close'): void;
+  (e: 'select', chapter: number): void;
+}>();
+</script>
+
+<template>
+  <Teleport to="body">
+    <transition name="fade">
+      <!-- Backdrop -->
+      <div
+        v-if="isOpen"
+        @click="$emit('close')"
+        class="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-opacity"
+      ></div>
+    </transition>
+
+    <transition name="slide-up">
+      <!-- Sheet -->
+      <div
+        v-if="isOpen"
+        class="fixed bottom-0 left-0 right-0 z-[70] bg-background-secondary border-t border-border rounded-t-2xl shadow-2xl max-h-[70vh] flex flex-col w-full max-w-2xl mx-auto"
+      >
+        <!-- Header / Handle -->
+        <div class="flex-none p-4 border-b border-border flex items-center justify-between">
+          <span class="text-sm font-bold uppercase tracking-widest text-text-muted">Table of Contents</span>
+          <button
+            @click="$emit('close')"
+            class="p-2 -mr-2 text-text-muted hover:text-text-primary transition-colors rounded-full hover:bg-background-tertiary"
+          >
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <!-- Scrollable List -->
+        <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
+          <div class="grid grid-cols-1 gap-2">
+            <button
+              v-for="i in totalChapters"
+              :key="i"
+              @click="$emit('select', i)"
+              class="flex items-center justify-between p-4 rounded-lg transition-all border text-left group"
+              :class="[
+                currentChapter === i
+                  ? 'bg-accent/10 border-accent text-accent'
+                  : 'bg-background-primary border-border text-text-secondary hover:border-text-muted hover:text-text-primary'
+              ]"
+            >
+              <span class="font-sans font-bold text-sm">Chapter {{ i }}</span>
+
+              <span v-if="currentChapter === i" class="material-symbols-outlined text-[20px]">check_circle</span>
+              <span v-else class="material-symbols-outlined text-[20px] opacity-0 group-hover:opacity-100 text-text-muted transition-opacity">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
+  </Teleport>
+</template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.slide-up-enter-from,
+.slide-up-leave-to {
+  transform: translateY(100%);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+</style>

@@ -5,6 +5,7 @@ import ViewerHeader from './parts/ViewerHeader.vue';
 import ViewerControls from './parts/ViewerControls.vue';
 import ViewerContent from './parts/ViewerContent.vue';
 import ReadingProgress from './parts/ReadingProgress.vue';
+import ChapterListModal from './parts/ChapterListModal.vue'; // Импорт нового компонента
 import { ReaderSettings, useReadingSettingsStore } from '@/features/customize-reading';
 import { useReadingProgressStore, ResumePrompt } from '@/features/reading-progress';
 import { useViewHistoryStore } from '@/features/view-history';
@@ -19,6 +20,7 @@ const { isFocusMode } = storeToRefs(settingsStore);
 
 const currentChapter = ref(1);
 const showResumePrompt = ref(false);
+const isChapterListOpen = ref(false); // Состояние для шторки
 const savedProgressState = ref<{ chapter: number; scroll: number } | null>(null);
 const viewerContentRef = ref<InstanceType<typeof ViewerContent> | null>(null);
 const contentElement = ref<HTMLElement | null>(null);
@@ -28,21 +30,16 @@ let scrollTimeout: number | null = null;
 // --- Helper: Scroll to Text Start ---
 const scrollToContentStart = () => {
   if (contentElement.value) {
-    // Получаем позицию элемента с текстом относительно вьюпорта
     const rect = contentElement.value.getBoundingClientRect();
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
-
-    // Вычисляем абсолютную позицию на странице
     const absoluteTop = rect.top + scrollTop;
 
-    // Скроллим к тексту минус 80px (чтобы захватить панель управления с номером главы)
-    // behavior: 'instant' убирает анимацию дергания
+    // Скролл с учетом небольшого отступа
     window.scrollTo({
       top: absoluteTop - 80,
       behavior: 'instant'
     });
   } else {
-    // Фолбек
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
 };
@@ -60,7 +57,7 @@ const handleScroll = () => {
 const nextChapter = () => {
   if (currentChapter.value < props.work.stats.chapters) {
     currentChapter.value++;
-    scrollToContentStart(); // Используем новый скролл
+    scrollToContentStart();
     progressStore.saveProgress(props.work.slug, currentChapter.value, 0);
   }
 };
@@ -68,9 +65,23 @@ const nextChapter = () => {
 const prevChapter = () => {
   if (currentChapter.value > 1) {
     currentChapter.value--;
-    scrollToContentStart(); // Используем новый скролл
+    scrollToContentStart();
     progressStore.saveProgress(props.work.slug, currentChapter.value, 0);
   }
+};
+
+// --- Chapter List Logic (New) ---
+const toggleChapterList = () => {
+  isChapterListOpen.value = !isChapterListOpen.value;
+};
+
+const selectChapter = (chapter: number) => {
+  if (chapter !== currentChapter.value) {
+    currentChapter.value = chapter;
+    scrollToContentStart();
+    progressStore.saveProgress(props.work.slug, currentChapter.value, 0);
+  }
+  isChapterListOpen.value = false;
 };
 
 // --- Keyboard Shortcuts ---
@@ -90,7 +101,9 @@ const handleKeydown = (e: KeyboardEvent) => {
     settingsStore.toggleFocusMode();
   }
   if (e.key === 'Escape') {
-    if (settingsStore.isSettingsOpen) {
+    if (isChapterListOpen.value) {
+      isChapterListOpen.value = false;
+    } else if (settingsStore.isSettingsOpen) {
       settingsStore.setSettingsOpen(false);
     } else if (isFocusMode.value) {
       settingsStore.setFocusMode(false);
@@ -98,7 +111,7 @@ const handleKeydown = (e: KeyboardEvent) => {
   }
 };
 
-// --- Swipe Logic (Mobile UX) ---
+// --- Swipe Logic ---
 const touchStartX = ref(0);
 const touchStartY = ref(0);
 const touchEndX = ref(0);
@@ -118,18 +131,12 @@ const handleTouchEnd = (e: TouchEvent) => {
 const handleSwipe = () => {
   const diffX = touchStartX.value - touchEndX.value;
   const diffY = touchStartY.value - touchEndY.value;
-
   const minSwipeDistance = 50;
   const maxVerticalDeviation = 100;
 
   if (Math.abs(diffX) > minSwipeDistance && Math.abs(diffY) < maxVerticalDeviation) {
-    if (diffX > 0) {
-      // Свайп влево -> Следующая глава
-      nextChapter();
-    } else {
-      // Свайп вправо -> Предыдущая глава
-      prevChapter();
-    }
+    if (diffX > 0) nextChapter();
+    else prevChapter();
   }
 };
 
@@ -148,9 +155,6 @@ const resumeReading = async () => {
   const { chapter, scroll } = savedProgressState.value;
   currentChapter.value = chapter;
   showResumePrompt.value = false;
-
-  // Для восстановления позиции оставляем smooth или instant по желанию
-  // Обычно лучше восстанавливать туда, где был
   setTimeout(() => {
     window.scrollTo({ top: scroll, behavior: 'instant' });
   }, 50);
@@ -160,7 +164,6 @@ const closePrompt = () => { showResumePrompt.value = false; };
 
 // --- Lifecycle ---
 onMounted(() => {
-  // Связываем ссылку на компонент с DOM элементом текста
   if (viewerContentRef.value) contentElement.value = viewerContentRef.value.contentElement;
   checkProgress();
   historyStore.addWork(props.work);
@@ -185,7 +188,7 @@ onUnmounted(() => {
 
 <template>
   <div class="animate-in fade-in duration-500 relative min-h-screen">
-    <!-- Кнопка выхода из Zen Mode -->
+    <!-- Exit Focus Mode -->
     <transition name="fade">
       <button
         v-if="isFocusMode"
@@ -208,11 +211,13 @@ onUnmounted(() => {
     <transition name="slide-up">
       <div v-show="!isFocusMode" class="flex gap-4 items-start justify-between mb-8 relative z-20">
         <div class="flex-1 max-w-2xl mx-auto w-full">
+          <!-- Контролы теперь обрабатывают toggle-list -->
           <ViewerControls
             :current-chapter="currentChapter"
             :total-chapters="work.stats.chapters"
             @next="nextChapter"
             @prev="prevChapter"
+            @toggle-list="toggleChapterList"
             class="!mb-0"
           />
         </div>
@@ -254,6 +259,14 @@ onUnmounted(() => {
       :chapter="savedProgressState?.chapter || 1"
       @resume="resumeReading"
       @close="closePrompt"
+    />
+
+    <ChapterListModal
+      :is-open="isChapterListOpen"
+      :current-chapter="currentChapter"
+      :total-chapters="work.stats.chapters"
+      @close="isChapterListOpen = false"
+      @select="selectChapter"
     />
   </div>
 </template>
