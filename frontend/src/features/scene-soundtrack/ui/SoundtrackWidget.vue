@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { SceneSoundtrack, Track } from '@/entities/work/model/types';
+// FIX: Импорт через Public API
+import type { SceneSoundtrack, Track } from '@/entities/work';
 import { useSceneSoundtrackStore } from '../model/store';
 import { storeToRefs } from 'pinia';
 import { onEnterAccordion, onLeaveAccordion } from '@/shared/lib/gsapTransitions';

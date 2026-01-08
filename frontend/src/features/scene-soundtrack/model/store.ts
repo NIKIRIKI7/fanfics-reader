@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { Track } from '@/entities/work/model/types';
+// FIX: Импорт через Public API
+import type { Track } from '@/entities/work';
 
 export const useSceneSoundtrackStore = defineStore('sceneSoundtrack', () => {
   const currentTrack = ref<Track | null>(null);

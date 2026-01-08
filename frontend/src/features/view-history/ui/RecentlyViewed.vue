@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { useViewHistoryStore } from '../model/store';
 import { WorkCard } from '@/entities/work';
-import { BookmarkButton } from '@/features/manage-library'; // <--- IMPORT
 import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
-import { useWorkFilterStore } from '@/features/filter-works';
 import { onMounted, ref, nextTick } from 'vue';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -13,13 +10,15 @@ gsap.registerPlugin(ScrollTrigger);
 
 const historyStore = useViewHistoryStore();
 const { history } = storeToRefs(historyStore);
-const router = useRouter();
-const filterStore = useWorkFilterStore();
 const containerRef = ref<HTMLElement | null>(null);
 
+// FIX: Вместо использования filterStore напрямую, эмитим событие наверх
+const emit = defineEmits<{
+  (e: 'clickTag', tag: string): void
+}>();
+
 const handleTagClick = (tag: string) => {
-  filterStore.searchByTag(tag);
-  router.push('/works');
+  emit('clickTag', tag);
 };
 
 onMounted(async () => {
@@ -63,7 +62,7 @@ onMounted(async () => {
       </button>
     </div>
 
-    <!-- Grid: Изменено на 3 колонки -->
+    <!-- Grid -->
     <div ref="containerRef" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 history-grid">
       <WorkCard
         v-for="work in history"
@@ -72,8 +71,9 @@ onMounted(async () => {
         @clickTag="handleTagClick"
         class="h-full history-item"
       >
+        <!-- FIX: Слот для кнопки, чтобы избежать кросс-импорта -->
         <template #action>
-          <BookmarkButton :work="work" size="sm" />
+           <slot name="action" :work="work"></slot>
         </template>
       </WorkCard>
     </div>

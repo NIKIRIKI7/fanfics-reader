@@ -3,7 +3,8 @@ import { computed, ref, onMounted, watch, nextTick, onBeforeUnmount } from 'vue'
 import { storeToRefs } from 'pinia';
 import { useReadingSettingsStore, type Theme } from '@/features/customize-reading';
 import { SoundtrackWidget, useSceneSoundtrackStore } from '@/features/scene-soundtrack';
-import type { SceneSoundtrack } from '@/entities/work/model/types';
+// FIX: Импорт через Public API
+import type { SceneSoundtrack } from '@/entities/work';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
