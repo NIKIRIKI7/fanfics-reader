@@ -73,3 +73,17 @@ body {
 .bg-noise {
   background-image: var(--background-image-noise);
 }
+
+/* Защита контента */
+.protected-content {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* IE10+/Edge */
+  user-select: none;         /* Standard */
+  -webkit-touch-callout: none; /* iOS Safari */
+}
+
+/* Запрет перетаскивания картинок (Ghost image) */
+.protected-content img {
+  pointer-events: none;
+}

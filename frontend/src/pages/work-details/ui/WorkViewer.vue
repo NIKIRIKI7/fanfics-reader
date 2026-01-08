@@ -14,8 +14,12 @@ import { useViewHistoryStore } from '@/features/view-history';
 import { ShareButton } from '@/features/share-work';
 import { AudioReaderWidget } from '@/features/audio-reader';
 import { DownloadButton } from '@/features/offline-mode';
+import { useContentProtection } from '@/features/content-protection'; // <--- IMPORT
 import { storeToRefs } from 'pinia';
 import { onEnterFade, onLeaveFade, onEnterSlideUp, onLeaveSlideUp } from '@/shared/lib/gsapTransitions';
+
+// Активируем защиту контента
+useContentProtection(true);
 
 const props = defineProps<{ work: Work }>();
 const progressStore = useReadingProgressStore();
@@ -128,11 +132,15 @@ onUnmounted(() => { window.removeEventListener('scroll', handleScroll); window.r
     </transition>
 
     <!-- Content -->
-    <ViewerContent
-      ref="viewerContentRef"
-      :content="work.content || '<p>Data corrupted. No content available.</p>'"
-      :soundtracks="work.soundtracks"
-    />
+    <div
+      class="protected-content"
+    >
+      <ViewerContent
+        ref="viewerContentRef"
+        :content="work.content || '<p>Data corrupted. No content available.</p>'"
+        :soundtracks="work.soundtracks"
+      />
+    </div>
 
     <!-- Mobile Bottom Toolbar -->
     <MobileToolbar :work="work" :is-visible="!isFocusMode" />

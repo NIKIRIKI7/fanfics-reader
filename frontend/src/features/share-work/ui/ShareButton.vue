@@ -3,9 +3,12 @@ import { ref, computed } from 'vue';
 import type { Work } from '@/entities/work';
 import ShareModal from './ShareModal.vue';
 
+defineOptions({
+  inheritAttrs: false
+});
+
 const props = withDefaults(defineProps<{
   work: Work;
-  // Добавляем вариант отображения
   variant?: 'default' | 'ghost';
 }>(), {
   variant: 'default'
@@ -17,17 +20,16 @@ const buttonClasses = computed(() => {
   const base = "flex items-center justify-center transition-all group cursor-pointer";
 
   if (props.variant === 'ghost') {
-    // Стиль для иконки в таббаре (без фона, без рамок)
     return `${base} text-text-muted hover:text-text-primary p-0 bg-transparent border-none`;
   }
 
-  // Стандартный стиль (с рамкой и фоном)
   return `${base} gap-2 px-3 py-2 rounded-lg border border-border bg-background-primary text-text-secondary hover:text-text-primary hover:border-text-muted text-xs uppercase font-bold tracking-wider shadow-sm`;
 });
 </script>
 
 <template>
   <button
+    v-bind="$attrs"
     @click="isModalOpen = true"
     :class="buttonClasses"
     title="Share Transmission"
