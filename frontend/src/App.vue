@@ -3,6 +3,7 @@ import { RouterView } from 'vue-router';
 import { useRoute } from 'vue-router';
 import { TheNavbar, TheFooter } from '@/widgets/layout';
 import { useReadingSettingsStore } from '@/features/customize-reading';
+import { NetworkStatus } from '@/features/offline-mode'; // <--- IMPORT
 import { onEnterFade, onLeaveFade, onEnterSlideDown, onLeaveSlideDown } from '@/shared/lib/gsapTransitions';
 
 const store = useReadingSettingsStore();
@@ -11,6 +12,9 @@ const route = useRoute(); // Импортируем useRoute
 
 <template>
   <div class="flex flex-col min-h-screen">
+    <!-- Network Indicator -->
+    <NetworkStatus /> <!-- <--- INSERT -->
+
     <!-- Navbar с GSAP анимацией -->
     <transition
       :css="false"

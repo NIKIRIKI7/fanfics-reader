@@ -11,6 +11,7 @@ import { useReadingProgressStore, ResumePrompt } from '@/features/reading-progre
 import { useViewHistoryStore } from '@/features/view-history';
 import { ShareButton } from '@/features/share-work';
 import { AudioReaderWidget } from '@/features/audio-reader';
+import { DownloadButton } from '@/features/offline-mode'; // <--- IMPORT
 import { storeToRefs } from 'pinia';
 import { onEnterFade, onLeaveFade, onEnterSlideUp, onLeaveSlideUp } from '@/shared/lib/gsapTransitions';
 
@@ -236,6 +237,9 @@ onUnmounted(() => {
             :author-audio-url="work.authorAudioUrl"
           />
 
+          <!-- Вставляем кнопку скачивания -->
+          <DownloadButton :work="work" /> <!-- <--- INSERT -->
+
           <ShareButton :work="work" />
 
           <button
@@ -254,20 +258,24 @@ onUnmounted(() => {
 
     <!-- Mobile Floating Controls (Bottom Right) -->
     <div v-show="!isFocusMode" class="md:hidden fixed bottom-6 right-6 z-40 flex flex-col gap-3 items-end pointer-events-none">
-      <div class="pointer-events-auto flex flex-col gap-3 items-end">
-        <AudioReaderWidget
-          :content="work.content || ''"
-          :author-audio-url="work.authorAudioUrl"
-        />
-        <ShareButton :work="work" />
-        <button
-          @click="settingsStore.setFocusMode(true)"
-          class="p-3 rounded-full bg-background-primary border border-border shadow-lg text-text-secondary"
-        >
-          <span class="material-symbols-outlined text-[20px]">open_in_full</span>
-        </button>
-        <ReaderSettings placement="top" />
-      </div>
+       <div class="pointer-events-auto flex flex-col gap-3 items-end">
+         <AudioReaderWidget
+           :content="work.content || ''"
+           :author-audio-url="work.authorAudioUrl"
+         />
+
+         <!-- Вставляем кнопку скачивания для мобилок -->
+         <DownloadButton :work="work" /> <!-- <--- INSERT -->
+
+         <ShareButton :work="work" />
+         <button
+           @click="settingsStore.setFocusMode(true)"
+           class="p-3 rounded-full bg-background-primary border border-border shadow-lg text-text-secondary"
+         >
+           <span class="material-symbols-outlined text-[20px]">open_in_full</span>
+         </button>
+         <ReaderSettings placement="top" />
+       </div>
     </div>
 
     <ViewerContent
