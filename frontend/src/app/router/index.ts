@@ -30,6 +30,12 @@ const router = createRouter({
       path: '/work/:slug',
       name: 'work-details',
       component: () => import('@/pages/work-details').then(m => m.WorkDetailsPage),
+    },
+    // !!! НОВЫЙ РОУТ !!!
+    {
+      path: '/library',
+      name: 'library',
+      component: () => import('@/pages/library').then(m => m.LibraryPage),
     }
   ],
   scrollBehavior(to, from, savedPosition) {

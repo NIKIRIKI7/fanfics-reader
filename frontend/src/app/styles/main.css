@@ -1,11 +1,6 @@
 @import "tailwindcss";
 
-/*
-  CONFIG: Theme Settings via CSS Variables mapping
-  Определяем токены дизайн-системы.
-*/
 @theme {
-  /* Colors mapping */
   --color-background-primary: var(--bg-primary);
   --color-background-secondary: var(--bg-secondary);
   --color-background-tertiary: var(--bg-tertiary);
@@ -17,50 +12,50 @@
   --color-border: var(--border-color);
   --color-accent: var(--accent-color);
 
-  /* Typography */
   --font-display: "Literata", serif;
   --font-sans: "Inter", sans-serif;
 
-  /* Custom Utilities */
-  --background-image-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  --background-image-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
 }
 
-/*
-  SEMANTIC VARIABLES
-  Определяем значения для темной (основной) и светлой тем.
-*/
 :root {
-  /* Fallback / Light Theme */
+  /* --- LAYOUT VARIABLES --- */
+  --app-max-width: 1200px;
+  --app-padding: 1.5rem; /* 24px (px-6) */
+
+  /* --- COLORS --- */
   --bg-primary: #ffffff;
   --bg-secondary: #f4f4f5;
   --bg-tertiary: #e5e5e5;
+
   --text-primary: #171717;
   --text-secondary: #404040;
   --text-muted: #737373;
+
   --border-color: #e5e5e5;
   --accent-color: #000000;
 }
 
 .dark {
-  /* Dark Theme (Project Default) */
-  --bg-primary: #050505;   /* Almost Black */
-  --bg-secondary: #0a0a0a; /* Slightly lighter */
-  --bg-tertiary: #171717;  /* Card background */
-  --text-primary: #e5e5e5; /* Main text */
-  --text-secondary: #a3a3a3; /* Secondary text */
-  --text-muted: #525252;   /* Muted text */
-  --border-color: #262626; /* Borders */
-  --accent-color: #ffffff; /* White accents */
+  --bg-primary: #050505;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #171717;
+
+  --text-primary: #e5e5e5;
+  --text-secondary: #a3a3a3;
+  --text-muted: #525252;
+
+  --border-color: #262626;
+  --accent-color: #ffffff;
 }
 
-/* GLOBAL RESETS */
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-display), serif;
 }
 
-/* Custom Scrollbar */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }

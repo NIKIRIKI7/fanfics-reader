@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { TheNavbar, TheFooter } from '@/widgets/layout';
 import { useReadingSettingsStore } from '@/features/customize-reading';
 import { onEnterFade, onLeaveFade, onEnterSlideDown, onLeaveSlideDown } from '@/shared/lib/gsapTransitions';
 
 const store = useReadingSettingsStore();
+const route = useRoute(); // Импортируем useRoute
 </script>
 
 <template>
@@ -26,7 +28,12 @@ const store = useReadingSettingsStore();
           mode="out-in"
           @enter="onEnterFade" @leave="onLeaveFade"
         >
-          <component :is="Component" />
+          <!--
+            ДОБАВЛЕН :key="route.path"
+            Это гарантирует, что при смене роута старый компонент уничтожается,
+            а новый создается с нуля. GSAP Context будет работать корректно.
+          -->
+          <component :is="Component" :key="route.path" />
         </transition>
       </RouterView>
     </main>

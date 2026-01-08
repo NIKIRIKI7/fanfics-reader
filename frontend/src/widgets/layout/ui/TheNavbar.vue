@@ -8,6 +8,7 @@ const isMenuOpen = ref(false);
 const links = [
   { path: '/', label: 'Home' },
   { path: '/works', label: 'Works' },
+  { path: '/library', label: 'Library' }, // <--- Добавлено
   { path: '/archive', label: 'Archive' },
   { path: '/contacts', label: 'Contacts' }
 ];
@@ -50,7 +51,8 @@ const onLinkLeave = (e: MouseEvent) => {
 
 <template>
   <header class="sticky top-0 z-50 w-full border-b border-border bg-background-primary/95 backdrop-blur-sm transition-colors duration-300">
-    <div class="max-w-[1200px] mx-auto px-6 h-16 flex items-center justify-between">
+    <!-- ИСПОЛЬЗУЕМ ПЕРЕМЕННЫЕ -->
+    <div class="w-full max-w-[var(--app-max-width)] mx-auto px-[var(--app-padding)] h-16 flex items-center justify-between">
       <!-- Logo -->
       <RouterLink to="/" class="flex items-center gap-3 group cursor-pointer">
         <div class="w-8 h-8 rounded-full bg-background-tertiary flex items-center justify-center text-text-primary transition-all duration-500 group-hover:bg-accent group-hover:text-background-primary group-hover:rotate-180">

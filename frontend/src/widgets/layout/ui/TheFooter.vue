@@ -1,6 +1,7 @@
 <template>
-  <footer class="border-t border-border bg-background-primary py-12 px-6 mt-auto">
-    <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+  <footer class="border-t border-border bg-background-primary py-12 px-[var(--app-padding)] mt-auto">
+    <!-- ИСПОЛЬЗУЕМ ПЕРЕМЕННЫЕ -->
+    <div class="w-full max-w-[var(--app-max-width)] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
       <div class="flex flex-col items-center md:items-start">
         <h4 class="text-sm font-bold uppercase tracking-tight text-text-primary mb-2 font-display">Project: Grey Sky / Deep Field</h4>
         <p class="text-xs text-text-muted font-sans">© 2026 Archive. All narratives preserved.</p>

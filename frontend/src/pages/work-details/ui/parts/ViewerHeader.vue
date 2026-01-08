@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router';
 import { type Work, getReadingTime } from '@/entities/work';
 import BaseTag from '@/shared/ui/BaseTag.vue';
 import { useWorkFilterStore } from '@/features/filter-works';
+import { BookmarkButton } from '@/features/manage-library'; // <--- IMPORT
 
 defineProps<{ work: Work }>();
 
@@ -18,10 +19,21 @@ const handleTagClick = (tag: string) => {
 </script>
 
 <template>
-  <header class="mb-12 border-b border-border pb-8 text-center">
+  <header class="mb-12 border-b border-border pb-8 text-center relative"> <!-- Добавлен relative -->
+
+    <!-- !!! НОВАЯ КНОПКА (Десктоп) !!! -->
+    <div class="absolute top-0 right-0 hidden md:block z-20">
+       <BookmarkButton :work="work" variant="full" />
+    </div>
+
     <!-- Badges -->
-    <div class="flex justify-center mb-4 gap-2">
-      <span class="inline-block px-3 py-1 text-xs font-bold uppercase tracking-widest border border-border rounded text-text-secondary">
+    <div class="flex justify-center mb-4 gap-2 items-center relative">
+       <!-- !!! НОВАЯ КНОПКА (Мобилки) !!! -->
+       <div class="md:hidden absolute left-0 top-1/2 -translate-y-1/2 z-20">
+           <BookmarkButton :work="work" variant="icon" size="sm" />
+       </div>
+
+       <span class="inline-block px-3 py-1 text-xs font-bold uppercase tracking-widest border border-border rounded text-text-secondary">
         {{ work.type }}
       </span>
       <span class="inline-block px-3 py-1 text-xs font-bold uppercase tracking-widest border border-accent/50 text-accent rounded">

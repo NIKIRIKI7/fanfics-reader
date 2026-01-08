@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useViewHistoryStore } from '../model/store';
 import { WorkCard } from '@/entities/work';
+import { BookmarkButton } from '@/features/manage-library'; // <--- IMPORT
 import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useWorkFilterStore } from '@/features/filter-works';
@@ -62,36 +63,26 @@ onMounted(async () => {
       </button>
     </div>
 
-    <!-- Grid -->
-    <div ref="containerRef" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 history-grid">
+    <!-- Grid: Изменено на 3 колонки -->
+    <div ref="containerRef" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 history-grid">
       <WorkCard
         v-for="work in history"
         :key="work.id"
         :work="work"
         @clickTag="handleTagClick"
         class="h-full history-item"
-      />
+      >
+        <template #action>
+          <BookmarkButton :work="work" size="sm" />
+        </template>
+      </WorkCard>
     </div>
   </section>
 </template>
 
 <style scoped>
+/* Стиль для более компактного вида в истории, если нужно, или просто убрать */
 .history-grid :deep(article) {
-  flex-direction: column !important;
-  height: 100%;
-  padding: 1rem;
   background-color: rgba(var(--bg-tertiary), 0.3);
 }
-
-.history-grid :deep(article > div:first-child) {
-  width: 100% !important;
-  height: 220px !important;
-  margin-bottom: 1rem;
-}
-
-.history-grid :deep(article h3) {
-  font-size: 1.25rem;
-  margin-bottom: 0.5rem;
-}
-
 </style>
