@@ -18,6 +18,10 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
   const pageWidth = ref<PageWidth>(getSaved('pageWidth', 'wide'));
   const lineHeight = ref<number>(getSaved('lineHeight', 2.2));
   const theme = ref<Theme>(getSaved('theme', 'black'));
+
+  // Новая настройка: Haptics (по умолчанию true)
+  const enableHaptics = ref<boolean>(getSaved('enableHaptics', true));
+
   const isFocusMode = ref(false);
 
   // ИЗМЕНЕНИЕ: Вместо isSettingsOpen (boolean) используем ID активного меню
@@ -35,6 +39,9 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
   const setTheme = (newTheme: Theme) => { theme.value = newTheme; };
   const setFocusMode = (value: boolean) => { isFocusMode.value = value; };
   const toggleFocusMode = () => { isFocusMode.value = !isFocusMode.value; };
+
+  // Toggle Haptics
+  const toggleHaptics = () => { enableHaptics.value = !enableHaptics.value; };
 
   // ИЗМЕНЕНИЕ: Логика переключения принимает ID
   const toggleSettings = (id: string) => {
@@ -57,15 +64,21 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
     if (val) closeSettings();
   });
 
-  watch([fontSize, fontWeight, letterSpacing, fontFamily, pageWidth, lineHeight, theme], () => {
-    localStorage.setItem('reading_fontSize', JSON.stringify(fontSize.value));
-    localStorage.setItem('reading_fontWeight', JSON.stringify(fontWeight.value));
-    localStorage.setItem('reading_letterSpacing', JSON.stringify(letterSpacing.value));
-    localStorage.setItem('reading_fontFamily', JSON.stringify(fontFamily.value));
-    localStorage.setItem('reading_pageWidth', JSON.stringify(pageWidth.value));
-    localStorage.setItem('reading_lineHeight', JSON.stringify(lineHeight.value));
-    localStorage.setItem('reading_theme', JSON.stringify(theme.value));
-  });
+  watch(
+    [fontSize, fontWeight, letterSpacing, fontFamily, pageWidth, lineHeight, theme, enableHaptics],
+    () => {
+      localStorage.setItem('reading_fontSize', JSON.stringify(fontSize.value));
+      localStorage.setItem('reading_fontWeight', JSON.stringify(fontWeight.value));
+      localStorage.setItem('reading_letterSpacing', JSON.stringify(letterSpacing.value));
+      localStorage.setItem('reading_fontFamily', JSON.stringify(fontFamily.value));
+      localStorage.setItem('reading_pageWidth', JSON.stringify(pageWidth.value));
+      localStorage.setItem('reading_lineHeight', JSON.stringify(lineHeight.value));
+      localStorage.setItem('reading_theme', JSON.stringify(theme.value));
+
+      // Сохраняем настройку вибрации
+      localStorage.setItem('reading_enableHaptics', JSON.stringify(enableHaptics.value));
+    }
+  );
 
   return {
     fontSize,
@@ -75,6 +88,7 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
     pageWidth,
     lineHeight,
     theme,
+    enableHaptics, // Export state
     isFocusMode,
     activeMenuId,
     isSettingsOpen,
@@ -88,6 +102,7 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
     setPageWidth,
     setLineHeight,
     setTheme,
+    toggleHaptics, // Export action
     setFocusMode,
     toggleFocusMode,
     toggleSettings,

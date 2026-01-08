@@ -3,6 +3,7 @@ import { ref, computed, watch, nextTick } from 'vue';
 import { useLibraryStore } from '../model/store';
 import type { Work } from '@/entities/work';
 import gsap from 'gsap';
+import { HapticPatterns, vibrate } from '@/shared/lib/haptics';
 
 const props = withDefaults(
   defineProps<{
@@ -26,6 +27,9 @@ const iconRef = ref<HTMLElement | null>(null);
 const toggle = async (event: Event) => {
   event.preventDefault();
   event.stopPropagation();
+
+  // Тактильный отклик: средний, так как это важное действие
+  vibrate(HapticPatterns.medium);
 
   // 1. Анимация нажатия кнопки (Press effect)
   if (buttonRef.value) {

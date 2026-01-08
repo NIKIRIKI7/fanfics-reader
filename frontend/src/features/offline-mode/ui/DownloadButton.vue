@@ -3,6 +3,7 @@ import { computed, ref, nextTick, watch } from 'vue';
 import { useOfflineStore } from '../model/store';
 import type { Work } from '@/entities/work';
 import gsap from 'gsap';
+import { HapticPatterns, vibrate } from '@/shared/lib/haptics';
 
 const props = withDefaults(defineProps<{
   work: Work;
@@ -17,6 +18,9 @@ const buttonRef = ref<HTMLElement | null>(null);
 const iconRef = ref<HTMLElement | null>(null);
 
 const handleToggle = async () => {
+  // Тактильный отклик
+  vibrate(HapticPatterns.medium);
+
   if (buttonRef.value) {
     gsap.to(buttonRef.value, {
       scale: 0.95,
@@ -28,7 +32,7 @@ const handleToggle = async () => {
   store.toggleDownload(props.work);
 };
 
-watch(isDownloaded, async (newVal) => {
+watch(isDownloaded, async () => {
   await nextTick();
   if (iconRef.value) {
     gsap.fromTo(iconRef.value,

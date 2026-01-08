@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<{
 const store = useReadingSettingsStore();
 const {
   fontSize, fontWeight, letterSpacing, fontFamily,
-  pageWidth, lineHeight, theme, activeMenuId
+  pageWidth, lineHeight, theme, activeMenuId, enableHaptics
 } = storeToRefs(store);
 
 // ИЗМЕНЕНИЕ: Проверяем, совпадает ли ID в сторе с ID этого компонента
@@ -112,6 +112,23 @@ const handleThemeChange = async (newTheme: Theme, event: MouseEvent) => {
           <div class="flex flex-col gap-2 setting-group"><span class="text-xs text-text-muted font-bold uppercase tracking-widest">Typeface</span><div class="flex bg-background-tertiary rounded-lg p-1"><button @click="store.setFontFamily('serif')" :class="['flex-1 py-1.5 text-sm rounded transition-all font-display', fontFamily === 'serif' ? 'bg-background-primary shadow-sm text-text-primary' : 'text-text-muted hover:text-text-secondary']">Serif</button><button @click="store.setFontFamily('sans')" :class="['flex-1 py-1.5 text-sm rounded transition-all font-sans', fontFamily === 'sans' ? 'bg-background-primary shadow-sm text-text-primary' : 'text-text-muted hover:text-secondary']">Sans</button></div></div>
 
           <div class="flex flex-col gap-2 setting-group"><span class="text-xs text-text-muted font-bold uppercase tracking-widest">Layout</span><div class="grid grid-cols-2 gap-2"><div class="flex bg-background-tertiary rounded-lg p-1"><button v-for="lh in lineHeights" :key="lh.value" @click="store.setLineHeight(lh.value)" :class="['flex-1 flex items-center justify-center rounded transition-all', lineHeight === lh.value ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-muted hover:text-secondary']"><span class="material-symbols-outlined text-[16px]">{{ lh.icon }}</span></button></div><div class="flex bg-background-tertiary rounded-lg p-1"><button v-for="width in ['narrow', 'standard', 'wide'] as const" :key="width" @click="store.setPageWidth(width)" :class="['flex-1 flex items-center justify-center rounded transition-all', pageWidth === width ? 'bg-background-primary text-text-primary shadow-sm' : 'text-text-muted hover:text-secondary']"><span class="material-symbols-outlined text-[16px]" v-if="width === 'narrow'">align_justify_center</span><span class="material-symbols-outlined text-[16px]" v-else-if="width === 'standard'">format_align_justify</span><span class="material-symbols-outlined text-[16px]" v-else>format_align_left</span></button></div></div></div>
+
+          <!-- Haptics (NEW SECTION) -->
+          <div class="flex flex-col gap-2 setting-group pt-2 border-t border-border/50">
+             <div class="flex items-center justify-between">
+                <span class="text-xs text-text-muted font-bold uppercase tracking-widest">Haptic Feedback</span>
+                <button
+                  @click="store.toggleHaptics"
+                  class="w-12 h-6 rounded-full transition-colors relative flex items-center px-1"
+                  :class="enableHaptics ? 'bg-accent' : 'bg-background-tertiary'"
+                >
+                  <div
+                    class="w-4 h-4 rounded-full bg-background-primary shadow-sm transition-transform duration-300"
+                    :class="enableHaptics ? 'translate-x-6' : 'translate-x-0'"
+                  ></div>
+                </button>
+             </div>
+          </div>
 
         </div>
       </transition>
