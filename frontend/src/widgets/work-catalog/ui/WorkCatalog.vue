@@ -15,9 +15,9 @@ const { filteredWorks } = storeToRefs(store);
 const isLoading = ref(false);
 const containerRef = ref<HTMLElement | null>(null);
 const filterRef = ref<HTMLElement | null>(null);
-const rootRef = ref<HTMLElement | null>(null); // Для контекста
+const rootRef = ref<HTMLElement | null>(null); // Корневой элемент для scope
 
-let ctx: gsap.Context;
+let ctx: gsap.Context | null = null;
 
 const handleTagClick = (tag: string) => {
   store.searchByTag(tag);
@@ -25,12 +25,10 @@ const handleTagClick = (tag: string) => {
 };
 
 const animateItems = () => {
-  // 1. Если контекст уже был, делаем revert.
-  // Это очищает ВСЕ анимации и триггеры, созданные ВНУТРИ этого контекста.
-  // Не трогая глобальные триггеры других компонентов.
   if (ctx) ctx.revert();
 
-  // 2. Создаем новый контекст, привязанный к rootRef
+  if (!rootRef.value) return;
+
   ctx = gsap.context(() => {
 
     // Анимация фильтра
@@ -65,32 +63,30 @@ const animateItems = () => {
         });
       }
     }
-  }, rootRef.value); // <--- ВАЖНО: Scope
+  }, rootRef.value);
 };
 
 watch(filteredWorks, async () => {
   await nextTick();
   animateItems();
-  ScrollTrigger.refresh(); // Важно при изменении контента
+  ScrollTrigger.refresh();
 });
 
 onMounted(async () => {
   await nextTick();
-  // Небольшая задержка, чтобы убедиться, что Vue Transition закончился
   setTimeout(() => {
     animateItems();
     ScrollTrigger.refresh();
-  }, 100);
+  }, 50);
 });
 
 onUnmounted(() => {
-  if (ctx) ctx.revert(); // Полная очистка при уходе со страницы
+  if (ctx) ctx.revert();
 });
 </script>
 
 <template>
   <section ref="rootRef">
-    <!-- Feature: Filter (Анимируем появление) -->
     <div ref="filterRef" class="opacity-0">
       <WorkFilter class="mb-8" />
     </div>
@@ -120,7 +116,7 @@ onUnmounted(() => {
         class="col-span-full py-12 text-center border border-dashed border-border rounded-xl work-item bg-background-tertiary/5"
       >
         <div class="w-16 h-16 rounded-full bg-background-tertiary flex items-center justify-center mx-auto mb-4 text-text-muted">
-           <span class="material-symbols-outlined text-3xl">search_off</span>
+          <span class="material-symbols-outlined text-3xl">search_off</span>
         </div>
         <p class="text-text-muted font-display italic text-lg mb-2">Signal lost.</p>
         <p class="text-text-secondary text-sm mb-6">No records match your current parameters.</p>
