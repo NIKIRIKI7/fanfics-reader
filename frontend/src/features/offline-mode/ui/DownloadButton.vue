@@ -4,15 +4,19 @@ import { useOfflineStore } from '../model/store';
 import type { Work } from '@/entities/work';
 import gsap from 'gsap';
 
-const props = defineProps<{ work: Work }>();
-const store = useOfflineStore();
+const props = withDefaults(defineProps<{
+  work: Work;
+  variant?: 'default' | 'ghost'; // Новый проп
+}>(), {
+  variant: 'default'
+});
 
+const store = useOfflineStore();
 const isDownloaded = computed(() => store.isDownloaded(props.work.id));
 const buttonRef = ref<HTMLElement | null>(null);
 const iconRef = ref<HTMLElement | null>(null);
 
 const handleToggle = async () => {
-  // Анимация нажатия
   if (buttonRef.value) {
     gsap.to(buttonRef.value, {
       scale: 0.95,
@@ -24,7 +28,6 @@ const handleToggle = async () => {
   store.toggleDownload(props.work);
 };
 
-// Анимация иконки при изменении статуса
 watch(isDownloaded, async (newVal) => {
   await nextTick();
   if (iconRef.value) {
@@ -34,30 +37,41 @@ watch(isDownloaded, async (newVal) => {
     );
   }
 });
+
+const buttonClasses = computed(() => {
+  if (props.variant === 'ghost') {
+    return `flex items-center justify-center transition-colors p-0 border-none bg-transparent ${
+      isDownloaded.value ? 'text-green-500' : 'text-text-muted hover:text-text-primary'
+    }`;
+  }
+
+  // Default styling
+  return `flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-xs uppercase font-bold tracking-wider shadow-sm group ${
+    isDownloaded.value
+      ? 'bg-green-500/10 border-green-500 text-green-500'
+      : 'bg-background-primary border-border text-text-muted hover:text-text-primary hover:border-text-muted'
+  }`;
+});
 </script>
 
 <template>
   <button
     ref="buttonRef"
     @click="handleToggle"
-    class="flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-xs uppercase font-bold tracking-wider shadow-sm group"
-    :class="[
-      isDownloaded
-        ? 'bg-green-500/10 border-green-500 text-green-500'
-        : 'bg-background-primary border-border text-text-muted hover:text-text-primary hover:border-text-muted'
-    ]"
+    :class="buttonClasses"
     :title="isDownloaded ? 'Remove from Offline' : 'Download for Offline'"
   >
-    <div class="relative w-5 h-5 flex items-center justify-center">
+    <div class="relative flex items-center justify-center" :class="variant === 'ghost' ? 'w-6 h-6' : 'w-5 h-5'">
       <span
         ref="iconRef"
         :key="isDownloaded ? 'check' : 'download'"
-        class="material-symbols-outlined text-[20px] absolute"
+        class="material-symbols-outlined absolute"
+        :class="variant === 'ghost' ? 'text-[26px]' : 'text-[20px]'"
       >
         {{ isDownloaded ? 'offline_pin' : 'download' }}
       </span>
     </div>
-    <span class="hidden xl:inline">
+    <span v-if="variant === 'default'" class="hidden xl:inline">
       {{ isDownloaded ? 'Downloaded' : 'Offline' }}
     </span>
   </button>

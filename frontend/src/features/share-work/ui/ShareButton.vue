@@ -1,26 +1,51 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import type { Work } from '@/entities/work';
 import ShareModal from './ShareModal.vue';
 
-defineProps<{ work: Work }>();
+const props = withDefaults(defineProps<{
+  work: Work;
+  // Добавляем вариант отображения
+  variant?: 'default' | 'ghost';
+}>(), {
+  variant: 'default'
+});
 
 const isModalOpen = ref(false);
+
+const buttonClasses = computed(() => {
+  const base = "flex items-center justify-center transition-all group cursor-pointer";
+
+  if (props.variant === 'ghost') {
+    // Стиль для иконки в таббаре (без фона, без рамок)
+    return `${base} text-text-muted hover:text-text-primary p-0 bg-transparent border-none`;
+  }
+
+  // Стандартный стиль (с рамкой и фоном)
+  return `${base} gap-2 px-3 py-2 rounded-lg border border-border bg-background-primary text-text-secondary hover:text-text-primary hover:border-text-muted text-xs uppercase font-bold tracking-wider shadow-sm`;
+});
 </script>
 
 <template>
-  <button 
+  <button
     @click="isModalOpen = true"
-    class="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background-primary text-text-secondary hover:text-text-primary hover:border-text-muted transition-all text-xs uppercase font-bold tracking-wider shadow-sm group"
+    :class="buttonClasses"
     title="Share Transmission"
   >
-    <span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">share</span>
-    <span class="hidden md:inline">Share</span>
+    <span
+      class="material-symbols-outlined transition-transform"
+      :class="variant === 'ghost' ? 'text-[24px]' : 'text-[20px] group-hover:scale-110'"
+    >
+      share
+    </span>
+
+    <!-- Текст показываем только в дефолтном варианте и на десктопе -->
+    <span v-if="variant === 'default'" class="hidden md:inline">Share</span>
   </button>
 
-  <ShareModal 
-    :work="work" 
-    :is-open="isModalOpen" 
-    @close="isModalOpen = false" 
+  <ShareModal
+    :work="work"
+    :is-open="isModalOpen"
+    @close="isModalOpen = false"
   />
 </template>

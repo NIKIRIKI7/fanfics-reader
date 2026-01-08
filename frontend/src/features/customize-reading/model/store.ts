@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 
 export type FontFamily = 'serif' | 'sans';
 export type PageWidth = 'narrow' | 'standard' | 'wide';
@@ -11,54 +11,52 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
     return saved ? (JSON.parse(saved) as T) : def;
   };
 
-  // --- ОБНОВЛЕННЫЕ ДЕФОЛТНЫЕ ЗНАЧЕНИЯ ---
-
-  const fontSize = ref<number>(getSaved('fontSize', 24)); // Было 18 -> Стало 24
-  const fontWeight = ref<number>(getSaved('fontWeight', 400)); // 400
-  const letterSpacing = ref<number>(getSaved('letterSpacing', 0)); // 0
-  const fontFamily = ref<FontFamily>(getSaved('fontFamily', 'serif')); // Serif
-
-  // Rightmost icon selected -> 'wide'
-  const pageWidth = ref<PageWidth>(getSaved('pageWidth', 'wide')); // Было 'standard' -> Стало 'wide'
-
-  // Rightmost icon selected -> 2.2 (Loose)
-  const lineHeight = ref<number>(getSaved('lineHeight', 2.2)); // Было 1.8 -> Стало 2.2
-
-  // Checkmark on black circle -> 'black'
-  const theme = ref<Theme>(getSaved('theme', 'black')); // Было 'dark' -> Стало 'black'
-
-  // НОВОЕ СОСТОЯНИЕ: Focus Mode (не сохраняем в LS)
+  const fontSize = ref<number>(getSaved('fontSize', 24));
+  const fontWeight = ref<number>(getSaved('fontWeight', 400));
+  const letterSpacing = ref<number>(getSaved('letterSpacing', 0));
+  const fontFamily = ref<FontFamily>(getSaved('fontFamily', 'serif'));
+  const pageWidth = ref<PageWidth>(getSaved('pageWidth', 'wide'));
+  const lineHeight = ref<number>(getSaved('lineHeight', 2.2));
+  const theme = ref<Theme>(getSaved('theme', 'black'));
   const isFocusMode = ref(false);
 
-  // НОВОЕ СОСТОЯНИЕ: Видимость меню настроек
-  const isSettingsOpen = ref(false);
-
-  // --- ACTIONS ---
+  // ИЗМЕНЕНИЕ: Вместо isSettingsOpen (boolean) используем ID активного меню
+  const activeMenuId = ref<string | null>(null);
 
   const increaseFont = () => { if (fontSize.value < 32) fontSize.value += 2; };
   const decreaseFont = () => { if (fontSize.value > 12) fontSize.value -= 2; };
-
   const increaseWeight = () => { if (fontWeight.value < 900) fontWeight.value += 100; };
   const decreaseWeight = () => { if (fontWeight.value > 100) fontWeight.value -= 100; };
-
   const increaseSpacing = () => { if (letterSpacing.value < 10) letterSpacing.value += 0.5; };
   const decreaseSpacing = () => { if (letterSpacing.value > -2) letterSpacing.value -= 0.5; };
-
   const setFontFamily = (family: FontFamily) => { fontFamily.value = family; };
   const setPageWidth = (width: PageWidth) => { pageWidth.value = width; };
   const setLineHeight = (height: number) => { lineHeight.value = height; };
-
   const setTheme = (newTheme: Theme) => { theme.value = newTheme; };
-
-  // Управление Focus Mode
   const setFocusMode = (value: boolean) => { isFocusMode.value = value; };
   const toggleFocusMode = () => { isFocusMode.value = !isFocusMode.value; };
 
-  // НОВЫЕ ACTIONS для меню
-  const toggleSettings = () => { isSettingsOpen.value = !isSettingsOpen.value; };
-  const setSettingsOpen = (value: boolean) => { isSettingsOpen.value = value; };
+  // ИЗМЕНЕНИЕ: Логика переключения принимает ID
+  const toggleSettings = (id: string) => {
+    if (activeMenuId.value === id) {
+      activeMenuId.value = null;
+    } else {
+      activeMenuId.value = id;
+    }
+  };
 
-  // --- WATCHER ---
+  const closeSettings = () => {
+    activeMenuId.value = null;
+  };
+
+  // Для совместимости, если где-то нужно проверить, открыто ли хоть что-то
+  const isSettingsOpen = computed(() => activeMenuId.value !== null);
+
+  // Закрываем меню при входе в фокус-режим
+  watch(isFocusMode, (val) => {
+    if (val) closeSettings();
+  });
+
   watch([fontSize, fontWeight, letterSpacing, fontFamily, pageWidth, lineHeight, theme], () => {
     localStorage.setItem('reading_fontSize', JSON.stringify(fontSize.value));
     localStorage.setItem('reading_fontWeight', JSON.stringify(fontWeight.value));
@@ -78,7 +76,8 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
     lineHeight,
     theme,
     isFocusMode,
-    isSettingsOpen, // Экспорт
+    activeMenuId,
+    isSettingsOpen,
     increaseFont,
     decreaseFont,
     increaseWeight,
@@ -91,7 +90,7 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
     setTheme,
     setFocusMode,
     toggleFocusMode,
-    toggleSettings, // Экспорт
-    setSettingsOpen // Экспорт
+    toggleSettings,
+    closeSettings // Экспортируем close
   };
 });
