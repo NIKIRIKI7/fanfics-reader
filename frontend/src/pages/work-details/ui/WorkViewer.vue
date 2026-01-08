@@ -10,6 +10,7 @@ import { ReaderSettings, useReadingSettingsStore } from '@/features/customize-re
 import { useReadingProgressStore, ResumePrompt } from '@/features/reading-progress';
 import { useViewHistoryStore } from '@/features/view-history';
 import { ShareButton } from '@/features/share-work';
+import { AudioReaderWidget } from '@/features/audio-reader';
 import { storeToRefs } from 'pinia';
 import { onEnterFade, onLeaveFade, onEnterSlideUp, onLeaveSlideUp } from '@/shared/lib/gsapTransitions';
 
@@ -24,7 +25,6 @@ const currentChapter = ref(1);
 const showResumePrompt = ref(false);
 const isChapterListOpen = ref(false);
 const savedProgressState = ref<{ chapter: number; scroll: number } | null>(null);
-
 const viewerContentRef = ref<InstanceType<typeof ViewerContent> | null>(null);
 const contentElement = ref<HTMLElement | null>(null);
 
@@ -34,12 +34,10 @@ const scrollToContentStart = () => {
   if (viewerContentRef.value) {
     contentElement.value = viewerContentRef.value.contentElement;
   }
-
   if (contentElement.value) {
     const rect = contentElement.value.getBoundingClientRect();
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
     const absoluteTop = rect.top + scrollTop;
-
     window.scrollTo({
       top: absoluteTop - 100,
       behavior: 'instant'
@@ -91,7 +89,6 @@ const selectChapter = async (chapter: number) => {
 
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-
   if (e.key === 'ArrowLeft') {
     prevChapter();
   }
@@ -120,7 +117,6 @@ const touchStartY = ref(0);
 const touchEndX = ref(0);
 const touchEndY = ref(0);
 
-// ИСПРАВЛЕНИЕ: Используем переменную touch и проверяем её
 const handleTouchStart = (e: TouchEvent) => {
   const touch = e.changedTouches[0];
   if (touch) {
@@ -129,7 +125,6 @@ const handleTouchStart = (e: TouchEvent) => {
   }
 };
 
-// ИСПРАВЛЕНИЕ: Аналогично для touchEnd
 const handleTouchEnd = (e: TouchEvent) => {
   const touch = e.changedTouches[0];
   if (touch) {
@@ -165,9 +160,7 @@ const resumeReading = async () => {
   const { chapter, scroll } = savedProgressState.value;
   currentChapter.value = chapter;
   showResumePrompt.value = false;
-
   await nextTick();
-
   setTimeout(() => {
     window.scrollTo({ top: scroll, behavior: 'instant' });
   }, 50);
@@ -177,10 +170,8 @@ const closePrompt = () => { showResumePrompt.value = false; };
 
 onMounted(() => {
   if (viewerContentRef.value) contentElement.value = viewerContentRef.value.contentElement;
-
   checkProgress();
   historyStore.addWork(props.work);
-
   window.addEventListener('scroll', handleScroll, { passive: true });
   window.addEventListener('keydown', handleKeydown);
   window.addEventListener('touchstart', handleTouchStart, { passive: true });
@@ -192,9 +183,7 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown);
   window.removeEventListener('touchstart', handleTouchStart);
   window.removeEventListener('touchend', handleTouchEnd);
-
   if (scrollTimeout) clearTimeout(scrollTimeout);
-
   settingsStore.setFocusMode(false);
   settingsStore.setSettingsOpen(false);
 });
@@ -222,20 +211,33 @@ onUnmounted(() => {
       </div>
     </transition>
 
-    <!-- Используем SlideUp для контролов -->
+    <!-- Controls Section -->
     <transition :css="false" @enter="onEnterSlideUp" @leave="onLeaveSlideUp">
-      <div v-show="!isFocusMode" class="flex gap-4 items-start justify-between mb-8 relative z-20">
-        <div class="flex-1 max-w-2xl mx-auto w-full">
+      <div
+        v-show="!isFocusMode"
+        class="flex flex-col items-center gap-4 mb-10 relative z-20 w-full"
+      >
+        <!-- ROW 1: Chapter Controls (Centered) -->
+        <div class="w-full max-w-2xl mx-auto">
           <ViewerControls
             :current-chapter="currentChapter"
             :total-chapters="work.stats.chapters"
-            @next="nextChapter" @prev="prevChapter" @toggle-list="toggleChapterList"
+            @next="nextChapter"
+            @prev="prevChapter"
+            @toggle-list="toggleChapterList"
             class="!mb-0"
           />
         </div>
 
-        <div class="pt-2 hidden md:flex items-center gap-2">
+        <!-- ROW 2: Utility Buttons (Centered) -->
+        <div class="hidden md:flex flex-wrap items-center justify-center gap-3">
+          <AudioReaderWidget
+            :content="work.content || ''"
+            :author-audio-url="work.authorAudioUrl"
+          />
+
           <ShareButton :work="work" />
+
           <button
             @click="settingsStore.setFocusMode(true)"
             class="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background-primary text-text-muted hover:text-text-primary hover:border-text-muted transition-all text-xs uppercase font-bold tracking-wider shadow-sm"
@@ -244,20 +246,28 @@ onUnmounted(() => {
             <span class="material-symbols-outlined text-[20px]">open_in_full</span>
             <span class="hidden xl:inline">Focus</span>
           </button>
+
           <ReaderSettings />
         </div>
       </div>
     </transition>
 
-    <div v-show="!isFocusMode" class="md:hidden fixed bottom-6 right-6 z-40 flex flex-col gap-3 items-end">
-      <ShareButton :work="work" />
-      <button
-        @click="settingsStore.setFocusMode(true)"
-        class="p-3 rounded-full bg-background-primary border border-border shadow-lg text-text-secondary"
-      >
-        <span class="material-symbols-outlined text-[20px]">open_in_full</span>
-      </button>
-      <ReaderSettings placement="top" />
+    <!-- Mobile Floating Controls (Bottom Right) -->
+    <div v-show="!isFocusMode" class="md:hidden fixed bottom-6 right-6 z-40 flex flex-col gap-3 items-end pointer-events-none">
+      <div class="pointer-events-auto flex flex-col gap-3 items-end">
+        <AudioReaderWidget
+          :content="work.content || ''"
+          :author-audio-url="work.authorAudioUrl"
+        />
+        <ShareButton :work="work" />
+        <button
+          @click="settingsStore.setFocusMode(true)"
+          class="p-3 rounded-full bg-background-primary border border-border shadow-lg text-text-secondary"
+        >
+          <span class="material-symbols-outlined text-[20px]">open_in_full</span>
+        </button>
+        <ReaderSettings placement="top" />
+      </div>
     </div>
 
     <ViewerContent

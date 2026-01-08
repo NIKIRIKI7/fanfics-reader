@@ -44,4 +44,5 @@ export interface Work {
   // Added content field
   content?: string;
   soundtracks?: SceneSoundtrack[]; // Добавляем массив плейлистов
+  authorAudioUrl?: string; // Ссылка на аудиофайл авторской озвучки
 }

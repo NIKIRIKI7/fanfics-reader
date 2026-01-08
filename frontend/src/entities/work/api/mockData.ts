@@ -37,6 +37,7 @@ export const works: Work[] = [
     coverUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB7tdbDN6dNGK20-9amKZHfEyIyWXp38AEI7yYH29v1Q1P12uR9Y8stn1VoT1pXk3XM_qIRKl4Ps0A3hUAAVMt96EnlX3bfIX_3Zf2CZIRY_KDHAug6utFg9PYF5V0AB_bAxLzHKAhruQ89sHb6eGkItsK_ppz_URdkR6Xed7AziVlJfs4rkHlFZj21AE346VQRrGAkl2n4ezjmypcG3TSWATx1ZPwBuWd1xAofeYxdg7obqFPsVf-x2obBE46yIW7JqdXmqpz3dzI',
     stats: { words: 15402, chapters: 5, kudos: 120, date: '2023-10-27', status: 'Complete' },
     content: contentWithMusic,
+    authorAudioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', // Тестовая ссылка на аудиофайл авторской озвучки
     soundtracks: [
       {
         id: '1',
