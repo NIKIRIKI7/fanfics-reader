@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import gsap from 'gsap'
+import { Infinity, Menu, X } from 'lucide-vue-next'
 
 const isMenuOpen = ref(false)
 
@@ -62,7 +63,7 @@ const onLinkLeave = (e: MouseEvent) => {
         <div
           class="w-8 h-8 rounded-full bg-background-tertiary flex items-center justify-center text-text-primary transition-all duration-500 group-hover:bg-accent group-hover:text-background-primary group-hover:rotate-180"
         >
-          <span class="material-symbols-outlined text-[20px]">all_inclusive</span>
+          <Infinity :size="20" />
         </div>
         <h1
           class="text-sm md:text-base font-bold tracking-tight uppercase text-text-primary font-display group-hover:tracking-wide transition-all duration-300"
@@ -94,7 +95,7 @@ const onLinkLeave = (e: MouseEvent) => {
         @click="isMenuOpen = !isMenuOpen"
         class="md:hidden p-2 text-text-primary transition-transform active:scale-90"
       >
-        <span class="material-symbols-outlined">{{ isMenuOpen ? 'close' : 'menu' }}</span>
+        <component :is="isMenuOpen ? X : Menu" :size="24" />
       </button>
     </div>
 

@@ -22,6 +22,7 @@ import {
   onEnterSlideUp,
   onLeaveSlideUp,
 } from '@/shared/lib/gsapTransitions'
+import { Minimize, Maximize } from 'lucide-vue-next'
 
 // Активируем защиту контента
 useContentProtection(true)
@@ -177,9 +178,7 @@ onUnmounted(() => {
         class="fixed top-6 right-6 z-50 p-3 rounded-full bg-background-secondary/10 hover:bg-background-secondary/80 text-text-muted hover:text-text-primary backdrop-blur transition-all duration-300 group"
         title="Exit Focus Mode (Esc)"
       >
-        <span class="material-symbols-outlined text-3xl group-hover:scale-110 transition-transform"
-          >close_fullscreen</span
-        >
+        <Minimize class="group-hover:scale-110 transition-transform" :size="30" />
       </button>
     </transition>
 
@@ -221,7 +220,7 @@ onUnmounted(() => {
             class="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background-primary text-text-muted hover:text-text-primary hover:border-text-muted transition-all text-xs uppercase font-bold tracking-wider shadow-sm"
             title="Enter Focus Mode (F)"
           >
-            <span class="material-symbols-outlined text-[20px]">open_in_full</span>
+            <Maximize :size="20" />
             <span class="hidden xl:inline">Focus</span>
           </button>
           <!-- ИЗМЕНЕНИЕ: Передаем уникальный ID для десктопа -->

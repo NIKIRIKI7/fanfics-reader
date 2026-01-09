@@ -6,6 +6,7 @@ import { BookmarkButton } from '@/features/manage-library'
 import { storeToRefs } from 'pinia'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { SearchX } from 'lucide-vue-next'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -134,7 +135,7 @@ onUnmounted(() => {
           <div
             class="w-16 h-16 rounded-full bg-background-tertiary flex items-center justify-center mx-auto mb-4 text-text-muted"
           >
-            <span class="material-symbols-outlined text-3xl">search_off</span>
+            <SearchX :size="32" />
           </div>
           <p class="text-text-muted font-display italic text-lg mb-2">Signal lost.</p>
           <p class="text-text-secondary text-sm mb-6">No records match your current parameters.</p>

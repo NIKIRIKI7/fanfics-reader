@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useWorkFilterStore } from '../../model/store'
 import { storeToRefs } from 'pinia'
+import { Check } from 'lucide-vue-next'
 
 const store = useWorkFilterStore()
 const { selectedStatuses } = storeToRefs(store)
@@ -29,11 +30,11 @@ const statuses = ['Complete', 'In Progress', 'One-Shot']
               : 'border-text-muted group-hover:border-text-primary'
           "
         >
-          <span
+          <Check
             v-if="selectedStatuses.includes(stat as any)"
-            class="material-symbols-outlined text-[12px] text-background-primary"
-            >check</span
-          >
+            class="text-background-primary"
+            :size="12"
+          />
         </div>
 
         <input

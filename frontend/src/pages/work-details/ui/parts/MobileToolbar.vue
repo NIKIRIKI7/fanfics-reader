@@ -5,6 +5,7 @@ import { AudioReaderWidget } from '@/features/audio-reader'
 import { DownloadButton } from '@/features/offline-mode'
 import { ShareButton } from '@/features/share-work'
 import gsap from 'gsap'
+import { Maximize } from 'lucide-vue-next'
 
 defineProps<{
   work: Work
@@ -60,7 +61,7 @@ const onLeave = (el: Element, done: () => void) => {
                   class="w-14 h-14 rounded-full bg-accent text-background-primary flex items-center justify-center shadow-xl shadow-accent/30 active:scale-95 transition-all border-4 border-background-secondary"
                   title="Enter Focus Mode"
                 >
-                  <span class="material-symbols-outlined text-[28px]">open_in_full</span>
+                  <Maximize :size="28" />
                 </button>
               </div>
 

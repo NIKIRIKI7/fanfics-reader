@@ -3,6 +3,7 @@ import { ref, computed, onUnmounted, onMounted } from 'vue'
 import { useAudioReaderStore } from '../model/store'
 import { storeToRefs } from 'pinia'
 import gsap from 'gsap'
+import { AudioWaveform, Mic, StopCircle, Play, Pause, ChevronDown } from 'lucide-vue-next'
 
 const props = withDefaults(
   defineProps<{
@@ -126,15 +127,11 @@ const containerClasses = computed(() => {
       :class="triggerClasses"
       title="Audio Log Protocol"
     >
-      <span
-        class="material-symbols-outlined"
-        :class="[
-          { 'animate-pulse': isPlaying },
-          variant === 'ghost' ? 'text-[26px]' : 'text-[20px]',
-        ]"
-      >
-        {{ activeMode === 'author' ? 'graphic_eq' : 'record_voice_over' }}
-      </span>
+      <component
+        :is="activeMode === 'author' ? AudioWaveform : Mic"
+        :class="[{ 'animate-pulse': isPlaying }]"
+        :size="variant === 'ghost' ? 26 : 20"
+      />
       <span v-if="variant === 'default'" class="hidden xl:inline">
         {{ activeMode === 'author' ? 'Audio File' : 'Neural Log' }}
       </span>
@@ -190,7 +187,7 @@ const containerClasses = computed(() => {
               class="text-text-muted hover:text-red-500 transition-colors"
               title="Terminate"
             >
-              <span class="material-symbols-outlined text-[18px]">stop_circle</span>
+              <StopCircle :size="18" />
             </button>
           </div>
 
@@ -199,9 +196,12 @@ const containerClasses = computed(() => {
               @click="togglePlay"
               class="w-14 h-14 rounded-full bg-accent text-background-primary flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-lg shadow-accent/20"
             >
-              <span class="material-symbols-outlined text-[32px] ml-1">{{
-                isPlaying ? 'pause' : 'play_arrow'
-              }}</span>
+              <component
+                :is="isPlaying ? Pause : Play"
+                :size="32"
+                class="ml-1"
+                fill="currentColor"
+              />
             </button>
           </div>
 
@@ -235,10 +235,10 @@ const containerClasses = computed(() => {
                     {{ v.label }}
                   </option>
                 </select>
-                <span
-                  class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-xs pointer-events-none text-text-muted"
-                  >expand_more</span
-                >
+                <ChevronDown
+                  class="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted"
+                  :size="12"
+                />
               </div>
             </div>
             <div class="flex flex-col gap-1">

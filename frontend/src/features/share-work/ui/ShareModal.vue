@@ -4,6 +4,7 @@ import html2canvas from 'html2canvas'
 import type { Work } from '@/entities/work'
 import { onEnterFade, onLeaveFade } from '@/shared/lib/gsapTransitions'
 import gsap from 'gsap'
+import { X, Link, Check, Loader2, Image as ImageIcon } from 'lucide-vue-next'
 
 const props = defineProps<{
   work: Work
@@ -101,7 +102,7 @@ const downloadImage = async () => {
               @click="$emit('close')"
               class="text-text-muted hover:text-text-primary transition-transform hover:rotate-90 duration-300"
             >
-              <span class="material-symbols-outlined">close</span>
+              <X :size="24" />
             </button>
           </div>
 
@@ -172,20 +173,8 @@ const downloadImage = async () => {
               <!-- Icon Container for Morphing -->
               <div class="relative w-6 h-6 flex items-center justify-center">
                 <transition :css="false" @enter="onEnterIcon" @leave="onLeaveIcon" mode="out-in">
-                  <span
-                    v-if="copyStatus === 'idle'"
-                    key="link"
-                    class="material-symbols-outlined text-[20px] absolute"
-                  >
-                    link
-                  </span>
-                  <span
-                    v-else
-                    key="check"
-                    class="material-symbols-outlined text-[20px] absolute font-bold"
-                  >
-                    check
-                  </span>
+                  <Link v-if="copyStatus === 'idle'" key="link" class="absolute" :size="20" />
+                  <Check v-else key="check" class="absolute font-bold" :size="20" />
                 </transition>
               </div>
 
@@ -199,10 +188,8 @@ const downloadImage = async () => {
               :disabled="isGenerating"
               class="w-full flex items-center justify-center gap-2 py-3 rounded-lg bg-accent text-background-primary hover:opacity-90 transition-opacity text-sm font-bold"
             >
-              <span v-if="isGenerating" class="material-symbols-outlined text-[18px] animate-spin"
-                >progress_activity</span
-              >
-              <span v-else class="material-symbols-outlined text-[18px]">image</span>
+              <Loader2 v-if="isGenerating" class="animate-spin" :size="18" />
+              <ImageIcon v-else :size="18" />
               {{ isGenerating ? 'Generating...' : 'Save as Image' }}
             </button>
           </div>

@@ -6,6 +6,7 @@ import BaseButton from '@/shared/ui/BaseButton.vue'
 import WorkViewer from './WorkViewer.vue'
 import ViewerSkeleton from './parts/ViewerSkeleton.vue'
 import { useOfflineStore } from '@/features/offline-mode' // <--- IMPORT
+import { ArrowLeft, CloudOff } from 'lucide-vue-next'
 
 const route = useRoute()
 const offlineStore = useOfflineStore()
@@ -39,7 +40,7 @@ onMounted(() => {
         to="/works"
         class="text-text-muted hover:text-text-primary flex items-center gap-2 text-sm transition-colors"
       >
-        <span class="material-symbols-outlined text-lg">arrow_back</span> Back to Catalog
+        <ArrowLeft :size="18" /> Back to Catalog
       </RouterLink>
     </div>
 
@@ -53,7 +54,7 @@ onMounted(() => {
         v-if="!offlineStore.isOnline"
         class="mb-4 px-3 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded text-yellow-500 text-xs font-bold uppercase tracking-wider flex items-center gap-2"
       >
-        <span class="material-symbols-outlined text-sm">cloud_off</span>
+        <CloudOff :size="14" />
         You are reading a saved copy
       </div>
 

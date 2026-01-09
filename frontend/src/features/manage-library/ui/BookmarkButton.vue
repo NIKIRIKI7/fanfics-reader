@@ -4,6 +4,7 @@ import { useLibraryStore } from '../model/store'
 import type { Work } from '@/entities/work'
 import gsap from 'gsap'
 import { HapticPatterns, vibrate } from '@/shared/lib/haptics'
+import { Bookmark } from 'lucide-vue-next'
 
 const props = withDefaults(
   defineProps<{
@@ -94,10 +95,13 @@ const classes = computed(() => {
       <span
         ref="iconRef"
         :key="isSaved ? 'saved' : 'unsaved'"
-        class="material-symbols-outlined absolute text-[20px]"
-        :class="{ 'font-bold filled-icon': isSaved }"
+        class="absolute flex items-center justify-center"
       >
-        {{ isSaved ? 'bookmark' : 'bookmark_add' }}
+        <Bookmark
+          :size="20"
+          :class="{ 'font-bold': isSaved }"
+          :fill="isSaved ? 'currentColor' : 'none'"
+        />
       </span>
     </div>
 

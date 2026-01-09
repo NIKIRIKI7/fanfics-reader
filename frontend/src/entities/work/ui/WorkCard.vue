@@ -3,6 +3,7 @@ import type { Work } from '../model/types'
 import BaseTag from '@/shared/ui/BaseTag.vue'
 import { RouterLink } from 'vue-router'
 import { getReadingTime } from '@/entities/work'
+import { Calendar, AlignLeft, Clock } from 'lucide-vue-next'
 
 defineProps<{ work: Work }>()
 
@@ -47,17 +48,17 @@ defineEmits<{
       <!-- Meta Info -->
       <div class="flex flex-wrap items-center gap-x-3 text-xs text-text-muted font-sans mb-3">
         <span class="flex items-center gap-1">
-          <span class="material-symbols-outlined text-[14px]">calendar_today</span>
+          <Calendar :size="14" />
           {{ work.stats.date }}
         </span>
         <span class="w-1 h-1 rounded-full bg-border"></span>
         <span class="flex items-center gap-1">
-          <span class="material-symbols-outlined text-[14px]">format_align_left</span>
+          <AlignLeft :size="14" />
           {{ (work.stats.words / 1000).toFixed(1) }}k
         </span>
         <span class="w-1 h-1 rounded-full bg-border"></span>
         <span class="flex items-center gap-1 text-text-secondary font-medium">
-          <span class="material-symbols-outlined text-[14px]">schedule</span>
+          <Clock :size="14" />
           {{ getReadingTime(work.stats.words) }}
         </span>
       </div>

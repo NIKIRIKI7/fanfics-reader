@@ -5,6 +5,7 @@ import type { SceneSoundtrack, Track } from '@/entities/work'
 import { useSceneSoundtrackStore } from '../model/store'
 import { storeToRefs } from 'pinia'
 import { onEnterAccordion, onLeaveAccordion } from '@/shared/lib/gsapTransitions'
+import { AudioWaveform, Music, ChevronDown, Play, Pause } from 'lucide-vue-next'
 
 const props = defineProps<{
   playlist: SceneSoundtrack
@@ -43,13 +44,12 @@ const isTrackActive = (trackId: string) => {
             : 'border-border text-text-secondary hover:border-text-muted hover:text-text-primary',
         ]"
       >
-        <span
-          class="material-symbols-outlined text-[24px] animate-pulse"
+        <AudioWaveform
           v-if="activeWidgetId === playlist.id && isPlaying"
-        >
-          graphic_eq
-        </span>
-        <span class="material-symbols-outlined text-[24px]" v-else> music_note </span>
+          :size="24"
+          class="animate-pulse"
+        />
+        <Music v-else :size="24" />
 
         <div class="flex flex-col">
           <span class="text-xs uppercase font-bold tracking-[0.2em] leading-none mb-1"
@@ -60,12 +60,11 @@ const isTrackActive = (trackId: string) => {
           </span>
         </div>
 
-        <span
-          class="material-symbols-outlined ml-2 transition-transform duration-300"
+        <ChevronDown
+          class="ml-2 transition-transform duration-300"
           :class="{ 'rotate-180': isOpen }"
-        >
-          expand_more
-        </span>
+          :size="24"
+        />
       </div>
     </div>
 
@@ -92,9 +91,11 @@ const isTrackActive = (trackId: string) => {
                   : 'bg-background-tertiary text-text-secondary group-hover:bg-text-secondary group-hover:text-background-primary'
               "
             >
-              <span class="material-symbols-outlined text-[16px]">
-                {{ isTrackActive(track.id) && isPlaying ? 'pause' : 'play_arrow' }}
-              </span>
+              <component
+                :is="isTrackActive(track.id) && isPlaying ? Pause : Play"
+                :size="16"
+                fill="currentColor"
+              />
             </div>
 
             <div class="flex flex-col overflow-hidden">

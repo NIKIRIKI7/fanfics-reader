@@ -4,6 +4,7 @@ import { type Work, getReadingTime } from '@/entities/work'
 import BaseTag from '@/shared/ui/BaseTag.vue'
 import { useWorkFilterStore } from '@/features/filter-works'
 import { BookmarkButton } from '@/features/manage-library' // <--- IMPORT
+import { Clock } from 'lucide-vue-next'
 
 defineProps<{ work: Work }>()
 
@@ -87,7 +88,7 @@ const handleTagClick = (tag: string) => {
       <!-- НОВОЕ: Время чтения -->
       <span class="w-1 h-1 rounded-full bg-border"></span>
       <span class="flex items-center gap-1 text-text-primary font-medium">
-        <span class="material-symbols-outlined text-[16px]">schedule</span>
+        <Clock :size="16" />
         {{ getReadingTime(work.stats.words) }}
       </span>
     </div>

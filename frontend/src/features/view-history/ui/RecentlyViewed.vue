@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia'
 import { onMounted, ref, nextTick } from 'vue'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { Trash2 } from 'lucide-vue-next'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -59,10 +60,7 @@ onMounted(async () => {
         @click="historyStore.clearHistory"
         class="group flex items-center gap-2 px-3 py-1.5 rounded-full border border-border/50 hover:border-red-500/50 hover:bg-red-500/10 transition-all duration-300"
       >
-        <span
-          class="material-symbols-outlined text-[16px] text-text-muted group-hover:text-red-500 transition-colors"
-          >delete_history</span
-        >
+        <Trash2 class="text-text-muted group-hover:text-red-500 transition-colors" :size="16" />
         <span
           class="text-[10px] font-bold uppercase tracking-widest text-text-muted group-hover:text-red-500 transition-colors"
           >Clear</span

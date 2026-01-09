@@ -8,6 +8,7 @@ import { RouterLink } from 'vue-router'
 import { useWorkFilterStore } from '@/features/filter-works'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { ArrowRight } from 'lucide-vue-next'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -77,7 +78,7 @@ onUnmounted(() => {
         to="/works"
         class="hidden md:flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-text-secondary hover:text-accent transition-colors"
       >
-        View All <span class="material-symbols-outlined text-lg">arrow_forward</span>
+        View All <ArrowRight :size="18" />
       </RouterLink>
     </div>
 
@@ -104,7 +105,7 @@ onUnmounted(() => {
         to="/works"
         class="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-text-secondary hover:text-accent transition-colors"
       >
-        View All <span class="material-symbols-outlined text-lg">arrow_forward</span>
+        View All <ArrowRight :size="18" />
       </RouterLink>
     </div>
   </section>

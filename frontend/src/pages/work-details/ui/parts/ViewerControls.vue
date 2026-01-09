@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { HapticPatterns, vibrate } from '@/shared/lib/haptics'
+import { ArrowLeft, ArrowRight, ChevronDown } from 'lucide-vue-next'
 
 defineProps<{
   currentChapter: number
@@ -41,7 +42,7 @@ const handleToggleList = () => {
       class="p-2 sm:px-4 text-text-secondary hover:text-text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed rounded hover:bg-background-tertiary"
       title="Previous Chapter"
     >
-      <span class="material-symbols-outlined">arrow_back</span>
+      <ArrowLeft :size="24" />
     </button>
 
     <!-- Сделали центральную часть кнопкой -->
@@ -53,10 +54,7 @@ const handleToggleList = () => {
       <span class="text-xs sm:text-sm font-bold text-text-primary font-sans">
         Chapter {{ currentChapter }} / {{ totalChapters }}
       </span>
-      <span
-        class="material-symbols-outlined text-[16px] text-text-muted group-hover:text-accent transition-colors"
-        >expand_more</span
-      >
+      <ChevronDown class="text-text-muted group-hover:text-accent transition-colors" :size="16" />
     </button>
 
     <button
@@ -65,7 +63,7 @@ const handleToggleList = () => {
       class="p-2 sm:px-4 text-text-secondary hover:text-text-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed rounded hover:bg-background-tertiary"
       title="Next Chapter"
     >
-      <span class="material-symbols-outlined">arrow_forward</span>
+      <ArrowRight :size="24" />
     </button>
   </div>
 </template>

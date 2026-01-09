@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onEnterFade, onLeaveFade } from '@/shared/lib/gsapTransitions'
 import gsap from 'gsap'
+import { X, CheckCircle, ArrowRight } from 'lucide-vue-next'
 
 defineProps<{
   isOpen: boolean
@@ -49,7 +50,7 @@ const onLeaveSheet = (el: Element, done: () => void) => {
             @click="$emit('close')"
             class="p-2 -mr-2 text-text-muted hover:text-text-primary transition-colors rounded-full hover:bg-background-tertiary"
           >
-            <span class="material-symbols-outlined">close</span>
+            <X :size="24" />
           </button>
         </div>
 
@@ -69,14 +70,12 @@ const onLeaveSheet = (el: Element, done: () => void) => {
             >
               <span class="font-sans font-bold text-sm">Chapter {{ i }}</span>
 
-              <span v-if="currentChapter === i" class="material-symbols-outlined text-[20px]"
-                >check_circle</span
-              >
-              <span
+              <CheckCircle v-if="currentChapter === i" :size="20" />
+              <ArrowRight
                 v-else
-                class="material-symbols-outlined text-[20px] opacity-0 group-hover:opacity-100 text-text-muted transition-opacity"
-                >arrow_forward</span
-              >
+                class="opacity-0 group-hover:opacity-100 text-text-muted transition-opacity"
+                :size="20"
+              />
             </button>
           </div>
         </div>

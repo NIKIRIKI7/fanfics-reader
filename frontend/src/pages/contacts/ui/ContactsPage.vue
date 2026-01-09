@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import { Bot, Film, Megaphone } from 'lucide-vue-next'
 
 onMounted(() => console.log('[Page] Contacts mounted'))
 </script>
@@ -34,7 +35,7 @@ onMounted(() => console.log('[Page] Contacts mounted'))
         <div
           class="size-12 rounded-full bg-background-primary border border-border flex items-center justify-center group-hover:border-accent group-hover:text-accent text-text-primary transition-colors"
         >
-          <span class="material-symbols-outlined text-2xl">smart_toy</span>
+          <Bot :size="24" />
         </div>
         <div>
           <h2 class="text-xl font-bold text-text-primary font-display mb-1">The Bot</h2>
@@ -50,7 +51,7 @@ onMounted(() => console.log('[Page] Contacts mounted'))
         <div
           class="size-12 rounded-full bg-background-primary border border-border flex items-center justify-center group-hover:border-accent group-hover:text-accent text-text-primary transition-colors"
         >
-          <span class="material-symbols-outlined text-2xl">movie_filter</span>
+          <Film :size="24" />
         </div>
         <div>
           <h2 class="text-xl font-bold text-text-primary font-display mb-1">Visual Logs</h2>
@@ -66,7 +67,7 @@ onMounted(() => console.log('[Page] Contacts mounted'))
         <div
           class="size-12 rounded-full bg-background-primary border border-border flex items-center justify-center group-hover:border-accent group-hover:text-accent text-text-primary transition-colors"
         >
-          <span class="material-symbols-outlined text-2xl">campaign</span>
+          <Megaphone :size="24" />
         </div>
         <div>
           <h2 class="text-xl font-bold text-text-primary font-display mb-1">High Command</h2>

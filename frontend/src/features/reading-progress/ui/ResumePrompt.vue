@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onEnterSlideUp, onLeaveSlideUp } from '@/shared/lib/gsapTransitions'
+import { X } from 'lucide-vue-next'
 
 defineProps<{
   chapter: number
@@ -38,7 +39,7 @@ defineEmits<{
               class="p-2 text-text-muted hover:text-text-primary transition-colors rounded-lg hover:bg-background-tertiary"
               title="Dismiss"
             >
-              <span class="material-symbols-outlined text-[20px]">close</span>
+              <X :size="20" />
             </button>
             <button
               @click="$emit('resume')"

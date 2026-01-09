@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useWorkFilterStore } from '../../model/store'
 import { storeToRefs } from 'pinia'
+import { Search, Archive, SlidersHorizontal } from 'lucide-vue-next'
 
 defineProps<{
   isAdvancedOpen: boolean
@@ -22,11 +23,10 @@ const mainFilters = ['All', 'Original', 'Fanfic']
   >
     <!-- Search Input -->
     <div class="w-full lg:w-1/3 relative group">
-      <span
-        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-text-primary transition-colors"
-      >
-        search
-      </span>
+      <Search
+        class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-text-primary transition-colors"
+        :size="20"
+      />
       <input
         v-model="searchQuery"
         type="text"
@@ -71,7 +71,7 @@ const mainFilters = ['All', 'Original', 'Fanfic']
         v-else
         class="flex items-center justify-center sm:justify-start gap-2 text-text-muted text-sm font-sans px-4"
       >
-        <span class="material-symbols-outlined text-[18px]">inventory_2</span>
+        <Archive :size="18" />
         Legacy Mode
       </div>
 
@@ -85,7 +85,7 @@ const mainFilters = ['All', 'Original', 'Fanfic']
             : 'border-border text-text-muted hover:border-text-muted',
         ]"
       >
-        <span class="material-symbols-outlined text-[20px]">tune</span>
+        <SlidersHorizontal :size="20" />
         <span class="hidden sm:inline">Filters</span>
         <span class="sm:hidden">Filters</span>
         <span

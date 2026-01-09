@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import type { Work } from '@/entities/work'
 import ShareModal from './ShareModal.vue'
+import { Share2 } from 'lucide-vue-next'
 
 defineOptions({
   inheritAttrs: false,
@@ -37,13 +38,11 @@ const buttonClasses = computed(() => {
     :class="buttonClasses"
     title="Share Transmission"
   >
-    <span
-      class="material-symbols-outlined transition-transform"
-      :class="variant === 'ghost' ? 'text-[24px]' : 'text-[20px] group-hover:scale-110'"
-    >
-      share
-    </span>
-
+    <Share2
+      class="transition-transform"
+      :class="variant === 'default' ? 'group-hover:scale-110' : ''"
+      :size="variant === 'ghost' ? 24 : 20"
+    />
     <!-- Текст показываем только в дефолтном варианте и на десктопе -->
     <span v-if="variant === 'default'" class="hidden md:inline">Share</span>
   </button>

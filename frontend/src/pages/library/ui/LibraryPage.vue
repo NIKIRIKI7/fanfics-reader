@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLibraryStore, BookmarkButton } from '@/features/manage-library'
 import { WorkCard } from '@/entities/work'
+import { HardDrive, Bookmark } from 'lucide-vue-next'
 
 const store = useLibraryStore()
 const router = useRouter()
@@ -48,7 +49,7 @@ const handleTagClick = (tag: string) => {
         <div
           class="w-10 h-10 rounded-full border-2 border-border relative flex items-center justify-center"
         >
-          <span class="material-symbols-outlined text-text-secondary text-[20px]">hard_drive</span>
+          <HardDrive class="text-text-secondary" :size="20" />
           <svg class="absolute inset-0 -rotate-90 transform" viewBox="0 0 40 40">
             <circle
               cx="20"
@@ -101,7 +102,7 @@ const handleTagClick = (tag: string) => {
       <div
         class="w-20 h-20 rounded-full bg-background-tertiary flex items-center justify-center mb-6 text-text-muted relative overflow-hidden group"
       >
-        <span class="material-symbols-outlined text-4xl relative z-10">bookmark_border</span>
+        <Bookmark class="relative z-10" :size="36" />
         <div
           class="absolute inset-0 bg-accent/20 scale-0 group-hover:scale-100 transition-transform duration-500 rounded-full"
         ></div>

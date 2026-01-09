@@ -4,6 +4,7 @@ import { useOfflineStore } from '../model/store'
 import type { Work } from '@/entities/work'
 import gsap from 'gsap'
 import { HapticPatterns, vibrate } from '@/shared/lib/haptics'
+import { CheckCircle, Download } from 'lucide-vue-next'
 
 const props = withDefaults(
   defineProps<{
@@ -73,13 +74,11 @@ const buttonClasses = computed(() => {
       class="relative flex items-center justify-center"
       :class="variant === 'ghost' ? 'w-6 h-6' : 'w-5 h-5'"
     >
-      <span
-        ref="iconRef"
-        :key="isDownloaded ? 'check' : 'download'"
-        class="material-symbols-outlined absolute"
-        :class="variant === 'ghost' ? 'text-[26px]' : 'text-[20px]'"
-      >
-        {{ isDownloaded ? 'offline_pin' : 'download' }}
+      <span ref="iconRef" :key="isDownloaded ? 'check' : 'download'" class="absolute">
+        <component
+          :is="isDownloaded ? CheckCircle : Download"
+          :size="variant === 'ghost' ? 26 : 20"
+        />
       </span>
     </div>
     <span v-if="variant === 'default'" class="hidden xl:inline">
