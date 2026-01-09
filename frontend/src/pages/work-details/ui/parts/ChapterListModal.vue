@@ -1,38 +1,32 @@
 <script setup lang="ts">
-import { onEnterFade, onLeaveFade } from '@/shared/lib/gsapTransitions';
-import gsap from 'gsap';
+import { onEnterFade, onLeaveFade } from '@/shared/lib/gsapTransitions'
+import gsap from 'gsap'
 
 defineProps<{
-  isOpen: boolean;
-  currentChapter: number;
-  totalChapters: number;
-}>();
+  isOpen: boolean
+  currentChapter: number
+  totalChapters: number
+}>()
 
 defineEmits<{
-  (e: 'close'): void;
-  (e: 'select', chapter: number): void;
-}>();
+  (e: 'close'): void
+  (e: 'select', chapter: number): void
+}>()
 
 // Custom transition for the sheet specifically
 const onEnterSheet = (el: Element, done: () => void) => {
-  gsap.fromTo(el,
-    { y: '100%' },
-    { y: '0%', duration: 0.4, ease: 'power3.out', onComplete: done }
-  );
-};
+  gsap.fromTo(el, { y: '100%' }, { y: '0%', duration: 0.4, ease: 'power3.out', onComplete: done })
+}
 
 const onLeaveSheet = (el: Element, done: () => void) => {
-  gsap.to(el, { y: '100%', duration: 0.3, ease: 'power3.in', onComplete: done });
-};
+  gsap.to(el, { y: '100%', duration: 0.3, ease: 'power3.in', onComplete: done })
+}
 </script>
 
 <template>
   <Teleport to="body">
     <!-- Backdrop -->
-    <transition
-      :css="false"
-      @enter="onEnterFade" @leave="onLeaveFade"
-    >
+    <transition :css="false" @enter="onEnterFade" @leave="onLeaveFade">
       <div
         v-if="isOpen"
         @click="$emit('close')"
@@ -41,17 +35,16 @@ const onLeaveSheet = (el: Element, done: () => void) => {
     </transition>
 
     <!-- Sheet -->
-    <transition
-      :css="false"
-      @enter="onEnterSheet" @leave="onLeaveSheet"
-    >
+    <transition :css="false" @enter="onEnterSheet" @leave="onLeaveSheet">
       <div
         v-if="isOpen"
         class="fixed bottom-0 left-0 right-0 z-[70] bg-background-secondary border-t border-border rounded-t-2xl shadow-2xl max-h-[70vh] flex flex-col w-full max-w-2xl mx-auto"
       >
         <!-- Header / Handle -->
         <div class="flex-none p-4 border-b border-border flex items-center justify-between">
-          <span class="text-sm font-bold uppercase tracking-widest text-text-muted">Table of Contents</span>
+          <span class="text-sm font-bold uppercase tracking-widest text-text-muted"
+            >Table of Contents</span
+          >
           <button
             @click="$emit('close')"
             class="p-2 -mr-2 text-text-muted hover:text-text-primary transition-colors rounded-full hover:bg-background-tertiary"
@@ -71,13 +64,19 @@ const onLeaveSheet = (el: Element, done: () => void) => {
               :class="[
                 currentChapter === i
                   ? 'bg-accent/10 border-accent text-accent'
-                  : 'bg-background-primary border-border text-text-secondary hover:border-text-muted hover:text-text-primary'
+                  : 'bg-background-primary border-border text-text-secondary hover:border-text-muted hover:text-text-primary',
               ]"
             >
               <span class="font-sans font-bold text-sm">Chapter {{ i }}</span>
 
-              <span v-if="currentChapter === i" class="material-symbols-outlined text-[20px]">check_circle</span>
-              <span v-else class="material-symbols-outlined text-[20px] opacity-0 group-hover:opacity-100 text-text-muted transition-opacity">arrow_forward</span>
+              <span v-if="currentChapter === i" class="material-symbols-outlined text-[20px]"
+                >check_circle</span
+              >
+              <span
+                v-else
+                class="material-symbols-outlined text-[20px] opacity-0 group-hover:opacity-100 text-text-muted transition-opacity"
+                >arrow_forward</span
+              >
             </button>
           </div>
         </div>

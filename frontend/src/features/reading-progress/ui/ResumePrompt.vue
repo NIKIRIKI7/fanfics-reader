@@ -1,33 +1,35 @@
 <script setup lang="ts">
-import { onEnterSlideUp, onLeaveSlideUp } from '@/shared/lib/gsapTransitions';
+import { onEnterSlideUp, onLeaveSlideUp } from '@/shared/lib/gsapTransitions'
 
 defineProps<{
-  chapter: number;
-  isVisible: boolean;
-}>();
+  chapter: number
+  isVisible: boolean
+}>()
 
 defineEmits<{
-  (e: 'resume'): void;
-  (e: 'close'): void;
-}>();
+  (e: 'resume'): void
+  (e: 'close'): void
+}>()
 </script>
 
 <template>
   <!-- Используем Teleport, чтобы вынести попап из контекста страницы -->
   <Teleport to="body">
-    <transition
-      :css="false"
-      @enter="onEnterSlideUp" @leave="onLeaveSlideUp"
-    >
+    <transition :css="false" @enter="onEnterSlideUp" @leave="onLeaveSlideUp">
       <div
         v-if="isVisible"
         class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-md"
       >
-        <div class="bg-background-secondary/95 backdrop-blur-md border border-accent/20 shadow-2xl rounded-xl p-4 flex items-center justify-between gap-4">
+        <div
+          class="bg-background-secondary/95 backdrop-blur-md border border-accent/20 shadow-2xl rounded-xl p-4 flex items-center justify-between gap-4"
+        >
           <div class="flex flex-col">
-            <span class="text-xs text-text-muted font-bold uppercase tracking-wider">Welcome Back</span>
+            <span class="text-xs text-text-muted font-bold uppercase tracking-wider"
+              >Welcome Back</span
+            >
             <span class="text-sm font-sans text-text-primary">
-              Resume reading from <span class="font-bold text-accent">Chapter {{ chapter }}</span>?
+              Resume reading from <span class="font-bold text-accent">Chapter {{ chapter }}</span
+              >?
             </span>
           </div>
           <div class="flex items-center gap-2">

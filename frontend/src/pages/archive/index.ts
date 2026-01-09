@@ -1,1 +1,1 @@
-export { default as ArchivePage } from './ui/ArchivePage.vue';
+export { default as ArchivePage } from './ui/ArchivePage.vue'

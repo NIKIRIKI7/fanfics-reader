@@ -1,1 +1,1 @@
-export { default as WorksPage } from './ui/WorksPage.vue';
+export { default as WorksPage } from './ui/WorksPage.vue'

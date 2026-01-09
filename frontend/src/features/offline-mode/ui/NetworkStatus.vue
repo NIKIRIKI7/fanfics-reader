@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { useOfflineStore } from '../model/store';
-import { storeToRefs } from 'pinia';
+import { ref, watch } from 'vue'
+import { useOfflineStore } from '../model/store'
+import { storeToRefs } from 'pinia'
 
-const store = useOfflineStore();
-const { isOnline } = storeToRefs(store);
+const store = useOfflineStore()
+const { isOnline } = storeToRefs(store)
 
 // Локальное состояние для скрытия
-const isDismissed = ref(false);
+const isDismissed = ref(false)
 
 // Если статус сети меняется (например, интернет появился, а потом снова пропал),
 // мы сбрасываем скрытие, чтобы снова уведомить пользователя.
 watch(isOnline, (online) => {
   if (online) {
-    isDismissed.value = false;
+    isDismissed.value = false
   }
-});
+})
 
 const dismiss = () => {
-  isDismissed.value = true;
-};
+  isDismissed.value = true
+}
 </script>
 
 <template>

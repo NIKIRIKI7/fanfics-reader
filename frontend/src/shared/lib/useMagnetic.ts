@@ -11,7 +11,7 @@ interface UseMagneticOptions {
 
 export function useMagnetic(options: UseMagneticOptions = {}) {
   const { strength = 0.3 } = options
-  
+
   const elementRef = ref<HTMLElement | null>(null)
   const position = ref({ x: 0, y: 0 })
   const isHovered = ref(false)
@@ -43,13 +43,13 @@ export function useMagnetic(options: UseMagneticOptions = {}) {
     transition: isHovered.value
       ? 'none'
       : 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), background-color 0.3s, border-color 0.3s, color 0.3s',
-    willChange: 'transform' // Оптимизация рендеринга
+    willChange: 'transform', // Оптимизация рендеринга
   }))
 
   return {
     elementRef,
     magneticStyle,
     handleMouseMove,
-    handleMouseLeave
+    handleMouseLeave,
   }
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import BaseSkeleton from '@/shared/ui/BaseSkeleton.vue';
+import BaseSkeleton from '@/shared/ui/BaseSkeleton.vue'
 </script>
 
 <template>

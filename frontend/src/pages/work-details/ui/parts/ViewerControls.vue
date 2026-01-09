@@ -1,38 +1,40 @@
 <script setup lang="ts">
-import { HapticPatterns, vibrate } from '@/shared/lib/haptics';
+import { HapticPatterns, vibrate } from '@/shared/lib/haptics'
 
 defineProps<{
-  currentChapter: number;
-  totalChapters: number;
-}>();
+  currentChapter: number
+  totalChapters: number
+}>()
 
 const emit = defineEmits<{
-  (e: 'prev'): void;
-  (e: 'next'): void;
-  (e: 'toggle-list'): void;
-}>();
+  (e: 'prev'): void
+  (e: 'next'): void
+  (e: 'toggle-list'): void
+}>()
 
 const handlePrev = () => {
   // Легкий отклик для навигации
-  vibrate(HapticPatterns.soft);
-  emit('prev');
-};
+  vibrate(HapticPatterns.soft)
+  emit('prev')
+}
 
 const handleNext = () => {
   // Легкий отклик для навигации
-  vibrate(HapticPatterns.soft);
-  emit('next');
-};
+  vibrate(HapticPatterns.soft)
+  emit('next')
+}
 
 const handleToggleList = () => {
   // Легкий отклик для UI
-  vibrate(HapticPatterns.soft);
-  emit('toggle-list');
-};
+  vibrate(HapticPatterns.soft)
+  emit('toggle-list')
+}
 </script>
 
 <template>
-  <div class="relative flex justify-between items-center bg-background-secondary/90 backdrop-blur p-2 sm:p-4 rounded-lg border border-border mb-8 shadow-sm transition-all">
+  <div
+    class="relative flex justify-between items-center bg-background-secondary/90 backdrop-blur p-2 sm:p-4 rounded-lg border border-border mb-8 shadow-sm transition-all"
+  >
     <button
       @click="handlePrev"
       :disabled="currentChapter <= 1"
@@ -51,7 +53,10 @@ const handleToggleList = () => {
       <span class="text-xs sm:text-sm font-bold text-text-primary font-sans">
         Chapter {{ currentChapter }} / {{ totalChapters }}
       </span>
-      <span class="material-symbols-outlined text-[16px] text-text-muted group-hover:text-accent transition-colors">expand_more</span>
+      <span
+        class="material-symbols-outlined text-[16px] text-text-muted group-hover:text-accent transition-colors"
+        >expand_more</span
+      >
     </button>
 
     <button

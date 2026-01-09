@@ -1,1 +1,1 @@
-export { default as ContactsPage } from './ui/ContactsPage.vue';
+export { default as ContactsPage } from './ui/ContactsPage.vue'

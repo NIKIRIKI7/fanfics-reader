@@ -1,36 +1,30 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useWorkFilterStore } from '../model/store';
-import FilterSearchBar from './parts/FilterSearchBar.vue';
-import FilterRating from './parts/FilterRating.vue';
-import FilterStatus from './parts/FilterStatus.vue';
-import FilterFandom from './parts/FilterFandom.vue';
-import FilterTags from './parts/FilterTags.vue';
-import { onEnterAccordion, onLeaveAccordion } from '@/shared/lib/gsapTransitions';
+import { ref } from 'vue'
+import { useWorkFilterStore } from '../model/store'
+import FilterSearchBar from './parts/FilterSearchBar.vue'
+import FilterRating from './parts/FilterRating.vue'
+import FilterStatus from './parts/FilterStatus.vue'
+import FilterFandom from './parts/FilterFandom.vue'
+import FilterTags from './parts/FilterTags.vue'
+import { onEnterAccordion, onLeaveAccordion } from '@/shared/lib/gsapTransitions'
 
-const store = useWorkFilterStore();
-const isAdvancedOpen = ref(false);
+const store = useWorkFilterStore()
+const isAdvancedOpen = ref(false)
 
 const toggleAdvanced = () => {
-  isAdvancedOpen.value = !isAdvancedOpen.value;
-};
+  isAdvancedOpen.value = !isAdvancedOpen.value
+}
 
 const closePanel = () => {
-  isAdvancedOpen.value = false;
-};
+  isAdvancedOpen.value = false
+}
 </script>
 
 <template>
   <div class="flex flex-col gap-2 mb-10 transition-all duration-300">
-    <FilterSearchBar
-      :isAdvancedOpen="isAdvancedOpen"
-      @toggleAdvanced="toggleAdvanced"
-    />
+    <FilterSearchBar :isAdvancedOpen="isAdvancedOpen" @toggleAdvanced="toggleAdvanced" />
 
-    <transition
-      :css="false"
-      @enter="onEnterAccordion" @leave="onLeaveAccordion"
-    >
+    <transition :css="false" @enter="onEnterAccordion" @leave="onLeaveAccordion">
       <div
         v-if="isAdvancedOpen"
         class="bg-background-secondary/95 backdrop-blur-xl border border-border rounded-xl p-6 shadow-xl overflow-hidden"

@@ -1,1 +1,1 @@
-export { default as WorkDetailsPage } from './ui/WorkDetailsPage.vue';
+export { default as WorkDetailsPage } from './ui/WorkDetailsPage.vue'

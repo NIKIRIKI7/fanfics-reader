@@ -1,1 +1,1 @@
-export { useContentProtection } from './model/useContentProtection';
+export { useContentProtection } from './model/useContentProtection'

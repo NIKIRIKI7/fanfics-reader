@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import BaseSkeleton from '@/shared/ui/BaseSkeleton.vue';
+import BaseSkeleton from '@/shared/ui/BaseSkeleton.vue'
 </script>
 
 <template>
-  <div class="flex flex-col rounded-xl border border-border bg-background-tertiary/10 overflow-hidden h-full">
+  <div
+    class="flex flex-col rounded-xl border border-border bg-background-tertiary/10 overflow-hidden h-full"
+  >
     <!-- Cover Image Skeleton -->
-    <BaseSkeleton
-      variant="rect"
-      class="w-full h-64 shrink-0 !rounded-none"
-    />
+    <BaseSkeleton variant="rect" class="w-full h-64 shrink-0 !rounded-none" />
 
     <!-- Content Block -->
     <div class="flex-1 flex flex-col p-5">

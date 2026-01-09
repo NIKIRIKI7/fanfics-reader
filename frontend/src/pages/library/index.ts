@@ -1,1 +1,1 @@
-export { default as LibraryPage } from './ui/LibraryPage.vue';
+export { default as LibraryPage } from './ui/LibraryPage.vue'

@@ -1,37 +1,38 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import gsap from 'gsap';
+import { onMounted, ref } from 'vue'
+import gsap from 'gsap'
 
 interface Props {
-  variant?: 'text' | 'rect' | 'circle';
-  width?: string;
-  height?: string;
-  class?: string;
+  variant?: 'text' | 'rect' | 'circle'
+  width?: string
+  height?: string
+  class?: string
 }
 
 withDefaults(defineProps<Props>(), {
   variant: 'text',
   width: '100%',
   height: 'auto',
-  class: ''
-});
+  class: '',
+})
 
-const skeletonRef = ref<HTMLElement | null>(null);
+const skeletonRef = ref<HTMLElement | null>(null)
 
 onMounted(() => {
   if (skeletonRef.value) {
     // Эффект мерцания (shimmer) через градиент
-    gsap.fromTo(skeletonRef.value,
+    gsap.fromTo(
+      skeletonRef.value,
       { backgroundPosition: '200% 0' },
       {
         backgroundPosition: '-200% 0',
         duration: 1.5,
         repeat: -1,
-        ease: 'linear'
-      }
-    );
+        ease: 'linear',
+      },
+    )
   }
-});
+})
 </script>
 
 <template>
@@ -41,7 +42,7 @@ onMounted(() => {
     :class="[
       variant === 'circle' ? 'rounded-full' : 'rounded-md',
       variant === 'text' ? 'h-4 my-1' : '',
-      $props.class
+      $props.class,
     ]"
     :style="{ width, height: variant !== 'text' ? height : undefined }"
   ></div>

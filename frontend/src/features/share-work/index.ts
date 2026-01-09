@@ -1,1 +1,1 @@
-export { default as ShareButton } from './ui/ShareButton.vue';
+export { default as ShareButton } from './ui/ShareButton.vue'

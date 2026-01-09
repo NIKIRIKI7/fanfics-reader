@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-background-primary: var(--bg-primary);
@@ -12,8 +12,8 @@
   --color-border: var(--border-color);
   --color-accent: var(--accent-color);
 
-  --font-display: "Literata", serif;
-  --font-sans: "Inter", sans-serif;
+  --font-display: 'Literata', serif;
+  --font-sans: 'Inter', sans-serif;
 
   --background-image-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
 }
@@ -77,9 +77,9 @@ body {
 /* Защита контента */
 .protected-content {
   -webkit-user-select: none; /* Safari */
-  -moz-user-select: none;    /* Firefox */
-  -ms-user-select: none;     /* IE10+/Edge */
-  user-select: none;         /* Standard */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
   -webkit-touch-callout: none; /* iOS Safari */
 }
 

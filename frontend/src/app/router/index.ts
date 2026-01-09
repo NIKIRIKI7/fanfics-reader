@@ -1,6 +1,6 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router'
 // ИСПРАВЛЕНО: Импорты через Public API страниц
-import { HomePage } from '@/pages/home';
+import { HomePage } from '@/pages/home'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,34 +14,34 @@ const router = createRouter({
       path: '/works',
       name: 'works',
       // Динамические импорты тоже через Public API
-      component: () => import('@/pages/works').then(m => m.WorksPage),
+      component: () => import('@/pages/works').then((m) => m.WorksPage),
     },
     {
       path: '/archive',
       name: 'archive',
-      component: () => import('@/pages/archive').then(m => m.ArchivePage),
+      component: () => import('@/pages/archive').then((m) => m.ArchivePage),
     },
     {
       path: '/contacts',
       name: 'contacts',
-      component: () => import('@/pages/contacts').then(m => m.ContactsPage),
+      component: () => import('@/pages/contacts').then((m) => m.ContactsPage),
     },
     {
       path: '/work/:slug',
       name: 'work-details',
-      component: () => import('@/pages/work-details').then(m => m.WorkDetailsPage),
+      component: () => import('@/pages/work-details').then((m) => m.WorkDetailsPage),
     },
     // !!! НОВЫЙ РОУТ !!!
     {
       path: '/library',
       name: 'library',
-      component: () => import('@/pages/library').then(m => m.LibraryPage),
-    }
+      component: () => import('@/pages/library').then((m) => m.LibraryPage),
+    },
   ],
   scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) return savedPosition;
-    return { top: 0 };
-  }
-});
+    if (savedPosition) return savedPosition
+    return { top: 0 }
+  },
+})
 
-export default router;
+export default router

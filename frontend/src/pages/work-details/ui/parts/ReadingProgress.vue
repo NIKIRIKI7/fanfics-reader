@@ -1,71 +1,75 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 
 const props = defineProps<{
   targetElement: HTMLElement | null
-}>();
+}>()
 
-const progress = ref(0);
-let rafId: number | null = null;
+const progress = ref(0)
+let rafId: number | null = null
 
 const calculateProgress = () => {
   if (!props.targetElement) {
-    progress.value = 0;
-    return;
+    progress.value = 0
+    return
   }
 
-  const element = props.targetElement;
+  const element = props.targetElement
   // Высота всего окна просмотра
-  const windowHeight = window.innerHeight;
+  const windowHeight = window.innerHeight
   // Текущая прокрутка сверху
-  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const scrollTop = window.scrollY || document.documentElement.scrollTop
 
   // Позиция элемента относительно начала страницы
-  const elementTop = element.offsetTop;
-  const elementHeight = element.offsetHeight;
+  const elementTop = element.offsetTop
+  const elementHeight = element.offsetHeight
 
   // Если элемент еще не начался (ниже экрана), прогресс 0
   if (scrollTop + windowHeight < elementTop) {
-    progress.value = 0;
-    return;
+    progress.value = 0
+    return
   }
 
   // Вычисляем позицию "дна" экрана относительно начала элемента
   // Это показывает, сколько пикселей контента пользователь уже "покрыл" взглядом
-  const scrolledPastElementTop = (scrollTop + windowHeight) - elementTop;
+  const scrolledPastElementTop = scrollTop + windowHeight - elementTop
 
   // Рассчитываем процент
-  const percent = (scrolledPastElementTop / elementHeight) * 100;
+  const percent = (scrolledPastElementTop / elementHeight) * 100
 
   // Ограничиваем от 0 до 100
-  progress.value = Math.min(100, Math.max(0, percent));
-};
+  progress.value = Math.min(100, Math.max(0, percent))
+}
 
 const onScroll = () => {
-  if (rafId) return;
+  if (rafId) return
   rafId = requestAnimationFrame(() => {
-    calculateProgress();
-    rafId = null;
-  });
-};
+    calculateProgress()
+    rafId = null
+  })
+}
 
-watch(() => props.targetElement, () => {
-  // Пересчитываем сразу, как только элемент стал доступен (например, при загрузке)
-  calculateProgress();
-}, { immediate: true });
+watch(
+  () => props.targetElement,
+  () => {
+    // Пересчитываем сразу, как только элемент стал доступен (например, при загрузке)
+    calculateProgress()
+  },
+  { immediate: true },
+)
 
 onMounted(() => {
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll, { passive: true });
+  window.addEventListener('scroll', onScroll, { passive: true })
+  window.addEventListener('resize', onScroll, { passive: true })
   // Дополнительный вызов для начальной инициализации
-  calculateProgress();
-});
+  calculateProgress()
+})
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', onScroll);
-  window.removeEventListener('resize', onScroll);
-  if (rafId) cancelAnimationFrame(rafId);
-});
+  window.removeEventListener('scroll', onScroll)
+  window.removeEventListener('resize', onScroll)
+  if (rafId) cancelAnimationFrame(rafId)
+})
 </script>
 
 <template>

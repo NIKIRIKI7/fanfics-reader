@@ -1,25 +1,28 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
-import { useRoute } from 'vue-router';
-import { TheNavbar, TheFooter } from '@/widgets/layout';
-import { useReadingSettingsStore } from '@/features/customize-reading';
-import { NetworkStatus } from '@/features/offline-mode'; // <--- IMPORT
-import { onEnterFade, onLeaveFade, onEnterSlideDown, onLeaveSlideDown } from '@/shared/lib/gsapTransitions';
+import { RouterView } from 'vue-router'
+import { useRoute } from 'vue-router'
+import { TheNavbar, TheFooter } from '@/widgets/layout'
+import { useReadingSettingsStore } from '@/features/customize-reading'
+import { NetworkStatus } from '@/features/offline-mode' // <--- IMPORT
+import {
+  onEnterFade,
+  onLeaveFade,
+  onEnterSlideDown,
+  onLeaveSlideDown,
+} from '@/shared/lib/gsapTransitions'
 
-const store = useReadingSettingsStore();
-const route = useRoute(); // Импортируем useRoute
+const store = useReadingSettingsStore()
+const route = useRoute() // Импортируем useRoute
 </script>
 
 <template>
   <div class="flex flex-col min-h-screen">
     <!-- Network Indicator -->
-    <NetworkStatus /> <!-- <--- INSERT -->
+    <NetworkStatus />
+    <!-- <--- INSERT -->
 
     <!-- Navbar с GSAP анимацией -->
-    <transition
-      :css="false"
-      @enter="onEnterSlideDown" @leave="onLeaveSlideDown"
-    >
+    <transition :css="false" @enter="onEnterSlideDown" @leave="onLeaveSlideDown">
       <div v-show="!store.isFocusMode" class="z-50 relative">
         <TheNavbar />
       </div>
@@ -27,11 +30,7 @@ const route = useRoute(); // Импортируем useRoute
 
     <main class="flex-1">
       <RouterView v-slot="{ Component }">
-        <transition
-          :css="false"
-          mode="out-in"
-          @enter="onEnterFade" @leave="onLeaveFade"
-        >
+        <transition :css="false" mode="out-in" @enter="onEnterFade" @leave="onLeaveFade">
           <!--
             ДОБАВЛЕН :key="route.path"
             Это гарантирует, что при смене роута старый компонент уничтожается,
@@ -43,10 +42,7 @@ const route = useRoute(); // Импортируем useRoute
     </main>
 
     <!-- Footer с GSAP анимацией -->
-    <transition
-      :css="false"
-      @enter="onEnterFade" @leave="onLeaveFade"
-    >
+    <transition :css="false" @enter="onEnterFade" @leave="onLeaveFade">
       <TheFooter v-show="!store.isFocusMode" />
     </transition>
   </div>

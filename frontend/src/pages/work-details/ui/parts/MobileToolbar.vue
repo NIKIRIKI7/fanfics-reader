@@ -1,31 +1,26 @@
 <script setup lang="ts">
-import { type Work } from '@/entities/work';
-import { useReadingSettingsStore, ReaderSettings } from '@/features/customize-reading';
-import { AudioReaderWidget } from '@/features/audio-reader';
-import { DownloadButton } from '@/features/offline-mode';
-import { ShareButton } from '@/features/share-work';
-import gsap from 'gsap';
+import { type Work } from '@/entities/work'
+import { useReadingSettingsStore, ReaderSettings } from '@/features/customize-reading'
+import { AudioReaderWidget } from '@/features/audio-reader'
+import { DownloadButton } from '@/features/offline-mode'
+import { ShareButton } from '@/features/share-work'
+import gsap from 'gsap'
 
 defineProps<{
-  work: Work;
-  isVisible: boolean;
-}>();
+  work: Work
+  isVisible: boolean
+}>()
 
-const settingsStore = useReadingSettingsStore();
+const settingsStore = useReadingSettingsStore()
 
 // Анимации
 const onEnter = (el: Element, done: () => void) => {
-  gsap.fromTo(el,
-    { y: '100%' },
-    { y: '0%', duration: 0.4, ease: 'power3.out', onComplete: done }
-  );
-};
+  gsap.fromTo(el, { y: '100%' }, { y: '0%', duration: 0.4, ease: 'power3.out', onComplete: done })
+}
 
 const onLeave = (el: Element, done: () => void) => {
-  gsap.to(el,
-    { y: '100%', duration: 0.3, ease: 'power3.in', onComplete: done }
-  );
-};
+  gsap.to(el, { y: '100%', duration: 0.3, ease: 'power3.in', onComplete: done })
+}
 </script>
 
 <template>
@@ -36,11 +31,12 @@ const onLeave = (el: Element, done: () => void) => {
         class="fixed bottom-0 left-0 w-full z-[50] pointer-events-none md:hidden"
       >
         <!-- Container -->
-        <div class="pointer-events-auto bg-background-secondary/95 backdrop-blur-xl border-t border-border shadow-[0_-10px_40px_rgba(0,0,0,0.2)] pb-[env(safe-area-inset-bottom)]">
+        <div
+          class="pointer-events-auto bg-background-secondary/95 backdrop-blur-xl border-t border-border shadow-[0_-10px_40px_rgba(0,0,0,0.2)] pb-[env(safe-area-inset-bottom)]"
+        >
           <div class="relative px-2 h-16 w-full max-w-lg mx-auto">
             <!-- Grid Layout -->
             <div class="grid grid-cols-5 h-full items-center justify-items-center">
-
               <!-- 1. Offline Mode -->
               <DownloadButton
                 :work="work"
@@ -83,7 +79,6 @@ const onLeave = (el: Element, done: () => void) => {
                 variant="ghost"
                 class="w-12 h-12 flex items-center justify-center"
               />
-
             </div>
           </div>
         </div>
