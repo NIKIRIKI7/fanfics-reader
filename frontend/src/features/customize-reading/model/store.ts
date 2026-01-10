@@ -32,6 +32,9 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
   const rulerHeight = ref<number>(getSaved('rulerHeight', 120)) // Высота "окна" в пикселях
   const rulerIntensity = ref<number>(getSaved('rulerIntensity', 0.6)) // Прозрачность затемнения (0-1)
 
+  // NEW: Infinite Scroll Setting
+  const isInfiniteScrollEnabled = ref<boolean>(getSaved('isInfiniteScrollEnabled', true))
+
   const increaseFont = () => {
     if (fontSize.value < 32) fontSize.value += 2
   }
@@ -92,6 +95,11 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
   const setRulerHeight = (h: number) => { rulerHeight.value = h }
   const setRulerIntensity = (i: number) => { rulerIntensity.value = i }
 
+  // NEW
+  const toggleInfiniteScroll = () => {
+    isInfiniteScrollEnabled.value = !isInfiniteScrollEnabled.value
+  }
+
   // Для совместимости, если где-то нужно проверить, открыто ли хоть что-то
   const isSettingsOpen = computed(() => activeMenuId.value !== null)
 
@@ -103,7 +111,7 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
   watch(
     [
       fontSize, fontWeight, letterSpacing, fontFamily, pageWidth, lineHeight, theme, enableHaptics,
-      isRulerEnabled, rulerHeight, rulerIntensity
+      isRulerEnabled, rulerHeight, rulerIntensity, isInfiniteScrollEnabled
     ],
     () => {
       localStorage.setItem('reading_fontSize', JSON.stringify(fontSize.value))
@@ -117,6 +125,7 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
       localStorage.setItem('reading_isRulerEnabled', JSON.stringify(isRulerEnabled.value))
       localStorage.setItem('reading_rulerHeight', JSON.stringify(rulerHeight.value))
       localStorage.setItem('reading_rulerIntensity', JSON.stringify(rulerIntensity.value))
+      localStorage.setItem('reading_isInfiniteScrollEnabled', JSON.stringify(isInfiniteScrollEnabled.value))
     },
   )
 
@@ -135,6 +144,7 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
     isRulerEnabled,
     rulerHeight,
     rulerIntensity,
+    isInfiniteScrollEnabled, // Export
     increaseFont,
     decreaseFont,
     increaseWeight,
@@ -152,6 +162,7 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
     closeSettings,
     toggleRuler,
     setRulerHeight,
-    setRulerIntensity
+    setRulerIntensity,
+    toggleInfiniteScroll // Export
   }
 })

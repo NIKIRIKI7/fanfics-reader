@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useReadingSettingsStore } from '../../model/store'
 import { storeToRefs } from 'pinia'
-import { Settings2, ScanLine, Sun, Moon, MoveHorizontal, Minus, Plus } from 'lucide-vue-next'
+import { Settings2, ScanLine, Sun, Moon, MoveHorizontal, Minus, Plus, ScrollText } from 'lucide-vue-next'
 import gsap from 'gsap'
 
 const store = useReadingSettingsStore()
@@ -12,7 +12,8 @@ const {
   enableHaptics,
   isRulerEnabled,
   rulerHeight,
-  rulerIntensity
+  rulerIntensity,
+  isInfiniteScrollEnabled // NEW
 } = storeToRefs(store)
 
 const lineHeights = [1.4, 1.8, 2.2]
@@ -99,6 +100,23 @@ const lineHeights = [1.4, 1.8, 2.2]
 
     <!-- Toggles Section -->
     <div class="flex flex-col gap-3">
+
+      <!-- NEW: Infinite Scroll Toggle -->
+      <label class="flex items-center justify-between p-2.5 rounded-xl bg-background-tertiary/20 border border-border/30 cursor-pointer hover:bg-background-tertiary/40 transition-colors select-none">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-full bg-background-primary text-text-secondary border border-border/10">
+            <ScrollText :size="16" />
+          </div>
+          <div class="flex flex-col">
+            <span class="text-sm font-bold text-text-primary">Auto-Load</span>
+            <span class="text-[10px] text-text-muted uppercase tracking-wider font-bold">Infinite Scroll</span>
+          </div>
+        </div>
+        <div class="relative">
+          <input type="checkbox" class="sr-only peer" :checked="isInfiniteScrollEnabled" @change="store.toggleInfiniteScroll">
+          <div class="w-10 h-6 bg-background-tertiary peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent transition-colors duration-300"></div>
+        </div>
+      </label>
 
       <!-- Haptics Toggle -->
       <label class="flex items-center justify-between p-2.5 rounded-xl bg-background-tertiary/20 border border-border/30 cursor-pointer hover:bg-background-tertiary/40 transition-colors select-none">

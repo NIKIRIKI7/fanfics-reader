@@ -23,6 +23,19 @@ const simpleContent = `
 <p>Kathryn stood, smoothing her uniform. "On screen."</p>
 `
 
+export const getChapterContent = async (slug: string, chapter: number): Promise<string> => {
+  await new Promise((resolve) => setTimeout(resolve, 600))
+
+  const baseContent = chapter === 1 ? contentWithMusic : simpleContent
+
+  return `
+    <div class="chapter-start-marker" data-chapter="${chapter}"></div>
+    ${baseContent}
+    <p><em>[System Log: Content of chapter ${chapter} loaded successfully from the database.]</em></p>
+    <p>The narrative continues deeper into the void. This is the generated content for chapter ${chapter}, simulating a fetch request from the server.</p>
+  `
+}
+
 export const works: Work[] = [
   {
     id: '1',
