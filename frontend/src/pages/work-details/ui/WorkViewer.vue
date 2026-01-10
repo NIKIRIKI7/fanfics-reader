@@ -8,7 +8,7 @@ import ReadingProgress from './parts/ReadingProgress.vue'
 import ChapterListModal from './parts/ChapterListModal.vue'
 import MobileToolbar from './parts/MobileToolbar.vue'
 
-import { ReaderSettings, useReadingSettingsStore } from '@/features/customize-reading'
+import { ReaderSettings, useReadingSettingsStore, ReadingRuler } from '@/features/customize-reading'
 import { useReadingProgressStore, ResumePrompt } from '@/features/reading-progress'
 import { useViewHistoryStore } from '@/features/view-history'
 import { ShareButton } from '@/features/share-work'
@@ -181,6 +181,9 @@ onUnmounted(() => {
         <Minimize class="group-hover:scale-110 transition-transform" :size="30" />
       </button>
     </transition>
+
+    <!-- Reading Ruler -->
+    <ReadingRuler />
 
     <ReadingProgress :target-element="contentElement" />
 

@@ -27,6 +27,11 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
   // ИЗМЕНЕНИЕ: Вместо isSettingsOpen (boolean) используем ID активного меню
   const activeMenuId = ref<string | null>(null)
 
+  // Новые настройки для Reading Ruler
+  const isRulerEnabled = ref<boolean>(getSaved('isRulerEnabled', false))
+  const rulerHeight = ref<number>(getSaved('rulerHeight', 120)) // Высота "окна" в пикселях
+  const rulerIntensity = ref<number>(getSaved('rulerIntensity', 0.6)) // Прозрачность затемнения (0-1)
+
   const increaseFont = () => {
     if (fontSize.value < 32) fontSize.value += 2
   }
@@ -82,6 +87,11 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
     activeMenuId.value = null
   }
 
+  // Методы для Ruler
+  const toggleRuler = () => { isRulerEnabled.value = !isRulerEnabled.value }
+  const setRulerHeight = (h: number) => { rulerHeight.value = h }
+  const setRulerIntensity = (i: number) => { rulerIntensity.value = i }
+
   // Для совместимости, если где-то нужно проверить, открыто ли хоть что-то
   const isSettingsOpen = computed(() => activeMenuId.value !== null)
 
@@ -91,7 +101,10 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
   })
 
   watch(
-    [fontSize, fontWeight, letterSpacing, fontFamily, pageWidth, lineHeight, theme, enableHaptics],
+    [
+      fontSize, fontWeight, letterSpacing, fontFamily, pageWidth, lineHeight, theme, enableHaptics,
+      isRulerEnabled, rulerHeight, rulerIntensity
+    ],
     () => {
       localStorage.setItem('reading_fontSize', JSON.stringify(fontSize.value))
       localStorage.setItem('reading_fontWeight', JSON.stringify(fontWeight.value))
@@ -100,9 +113,10 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
       localStorage.setItem('reading_pageWidth', JSON.stringify(pageWidth.value))
       localStorage.setItem('reading_lineHeight', JSON.stringify(lineHeight.value))
       localStorage.setItem('reading_theme', JSON.stringify(theme.value))
-
-      // Сохраняем настройку вибрации
       localStorage.setItem('reading_enableHaptics', JSON.stringify(enableHaptics.value))
+      localStorage.setItem('reading_isRulerEnabled', JSON.stringify(isRulerEnabled.value))
+      localStorage.setItem('reading_rulerHeight', JSON.stringify(rulerHeight.value))
+      localStorage.setItem('reading_rulerIntensity', JSON.stringify(rulerIntensity.value))
     },
   )
 
@@ -114,10 +128,13 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
     pageWidth,
     lineHeight,
     theme,
-    enableHaptics, // Export state
+    enableHaptics,
     isFocusMode,
     activeMenuId,
     isSettingsOpen,
+    isRulerEnabled,
+    rulerHeight,
+    rulerIntensity,
     increaseFont,
     decreaseFont,
     increaseWeight,
@@ -128,10 +145,13 @@ export const useReadingSettingsStore = defineStore('readingSettings', () => {
     setPageWidth,
     setLineHeight,
     setTheme,
-    toggleHaptics, // Export action
+    toggleHaptics,
     setFocusMode,
     toggleFocusMode,
     toggleSettings,
-    closeSettings, // Экспортируем close
+    closeSettings,
+    toggleRuler,
+    setRulerHeight,
+    setRulerIntensity
   }
 })

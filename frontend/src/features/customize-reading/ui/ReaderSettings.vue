@@ -1,20 +1,11 @@
 <script setup lang="ts">
-import { computed, nextTick } from 'vue'
-import { useReadingSettingsStore, type Theme } from '../model/store'
+import { computed, ref } from 'vue'
+import { useReadingSettingsStore } from '../model/store'
 import { storeToRefs } from 'pinia'
 import gsap from 'gsap'
-import {
-  Type,
-  Check,
-  Minus,
-  Plus,
-  Rows4,
-  Rows3,
-  Rows2,
-  AlignJustify,
-  AlignLeft,
-  AlignCenter,
-} from 'lucide-vue-next'
+import { Type, Palette, SlidersHorizontal } from 'lucide-vue-next'
+import SettingsTabDisplay from './parts/SettingsTabDisplay.vue'
+import SettingsTabTune from './parts/SettingsTabTune.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -30,38 +21,16 @@ const props = withDefaults(
 )
 
 const store = useReadingSettingsStore()
-const {
-  fontSize,
-  fontWeight,
-  letterSpacing,
-  fontFamily,
-  pageWidth,
-  lineHeight,
-  theme,
-  activeMenuId,
-  enableHaptics,
-} = storeToRefs(store)
+const { activeMenuId } = storeToRefs(store)
 
 const isOpen = computed(() => activeMenuId.value === props.menuId)
-
-const lineHeights = [
-  { label: 'Compact', value: 1.4, icon: Rows4 },
-  { label: 'Standard', value: 1.8, icon: Rows3 },
-  { label: 'Loose', value: 2.2, icon: Rows2 },
-]
-
-const themesList: { value: Theme; label: string; colorBg: string; colorText: string }[] = [
-  { value: 'light', label: 'Light', colorBg: '#ffffff', colorText: '#1a1a1a' },
-  { value: 'sepia', label: 'Sepia', colorBg: '#f4ecd8', colorText: '#5b4636' },
-  { value: 'dark', label: 'Dark', colorBg: '#27272a', colorText: '#e4e4e7' },
-  { value: 'black', label: 'OLED', colorBg: '#000000', colorText: '#a3a3a3' },
-]
+const activeTab = ref<'style' | 'tune'>('style')
 
 const panelClasses = computed(() => {
   if (props.placement === 'top') {
-    return 'fixed bottom-20 left-1/2 -translate-x-1/2 origin-bottom z-[60] w-[90vw] max-w-sm'
+    return 'fixed bottom-20 left-1/2 -translate-x-1/2 origin-bottom z-[60] w-[90vw] max-w-[340px]'
   }
-  return 'absolute top-full mt-2 right-0 origin-top-right w-72 max-w-[calc(100vw-3rem)]'
+  return 'absolute top-full mt-2 right-0 origin-top-right w-[320px] max-w-[calc(100vw-2rem)]'
 })
 
 const triggerClasses = computed(() => {
@@ -70,17 +39,16 @@ const triggerClasses = computed(() => {
       isOpen.value ? 'text-accent' : 'text-text-muted hover:text-text-primary'
     }`
   }
-  return `flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-xs uppercase font-bold tracking-wider shadow-sm ${
+  return `flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-xs uppercase font-bold tracking-wider shadow-sm select-none ${
     isOpen.value
       ? 'bg-accent text-background-primary border-accent'
-      : 'bg-background-primary border-border text-text-secondary hover:text-text-primary'
+      : 'bg-background-primary border-border text-text-secondary hover:text-text-primary hover:border-text-muted'
   }`
 })
 
 const onEnterPanel = (el: Element, done: () => void) => {
   const element = el as HTMLElement
-  const groups = element.querySelectorAll('.setting-group')
-  const startScale = props.placement === 'top' ? 0.9 : 0.92
+  const startScale = props.placement === 'top' ? 0.9 : 0.95
   const transformOrigin = props.placement === 'top' ? 'bottom center' : 'top right'
 
   gsap.fromTo(
@@ -89,78 +57,28 @@ const onEnterPanel = (el: Element, done: () => void) => {
       opacity: 0,
       scale: startScale,
       transformOrigin: transformOrigin,
-      y: props.placement === 'top' ? 20 : 0,
+      y: props.placement === 'top' ? 10 : -10,
     },
-    { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: 'back.out(1.2)' },
+    { opacity: 1, scale: 1, y: 0, duration: 0.25, ease: 'back.out(1.2)', onComplete: done },
   )
-
-  if (groups.length > 0) {
-    gsap.fromTo(
-      groups,
-      { opacity: 0, x: -10 },
-      {
-        opacity: 1,
-        x: 0,
-        duration: 0.4,
-        stagger: 0.05,
-        ease: 'power2.out',
-        delay: 0.1,
-        onComplete: done,
-      },
-    )
-  } else {
-    done()
-  }
 }
 
 const onLeavePanel = (el: Element, done: () => void) => {
   gsap.to(el, {
     opacity: 0,
-    scale: 0.9,
-    y: props.placement === 'top' ? 20 : 0,
+    scale: 0.95,
+    y: props.placement === 'top' ? 10 : -10,
     duration: 0.2,
     ease: 'power2.in',
     onComplete: done,
   })
 }
-
-const handleThemeChange = async (newTheme: Theme, event: MouseEvent) => {
-  if (!document.startViewTransition) {
-    store.setTheme(newTheme)
-    return
-  }
-  const x = event.clientX
-  const y = event.clientY
-  const endRadius = Math.hypot(
-    Math.max(x, window.innerWidth - x),
-    Math.max(y, window.innerHeight - y),
-  )
-
-  document.documentElement.style.setProperty('--theme-x', `${x}px`)
-  document.documentElement.style.setProperty('--theme-y', `${y}px`)
-  document.documentElement.style.setProperty('--theme-radius', '0px')
-
-  const transition = document.startViewTransition(async () => {
-    store.setTheme(newTheme)
-    await nextTick()
-  })
-  await transition.ready
-  const tween = { val: 0 }
-  gsap.to(tween, {
-    val: endRadius,
-    duration: 0.8,
-    ease: 'power1.in',
-    onUpdate: () => {
-      document.documentElement.style.setProperty('--theme-radius', `${tween.val}px`)
-    },
-  })
-}
 </script>
 
 <template>
-  <div class="relative z-40">
+  <div class="relative z-40 font-sans">
     <button @click="store.toggleSettings(props.menuId)" :class="triggerClasses">
-      <Type :size="variant === 'ghost' ? 26 : 20" />
+      <Type :size="variant === 'ghost' ? 24 : 18" />
       <span v-if="variant === 'default'" class="hidden sm:inline">Appearance</span>
     </button>
 
@@ -169,196 +87,33 @@ const handleThemeChange = async (newTheme: Theme, event: MouseEvent) => {
         <div
           v-if="isOpen"
           :class="[
-            'bg-background-primary/95 backdrop-blur-xl border border-border rounded-xl shadow-2xl p-5 flex flex-col gap-6 max-h-[70vh] overflow-y-auto custom-scrollbar',
+            'bg-background-primary/95 backdrop-blur-xl border border-border/60 rounded-2xl shadow-xl flex flex-col overflow-hidden ring-1 ring-white/5',
             panelClasses,
           ]"
         >
-          <!-- Theme -->
-          <div class="flex flex-col gap-2 setting-group">
-            <span class="text-xs text-text-muted font-bold uppercase tracking-widest">Theme</span>
-            <div class="flex gap-3 justify-between bg-background-tertiary rounded-lg p-3">
-              <button
-                v-for="t in themesList"
-                :key="t.value"
-                @click="handleThemeChange(t.value, $event)"
-                class="w-10 h-10 rounded-full border-2 transition-transform hover:scale-110 shadow-sm relative overflow-hidden shrink-0"
-                :class="theme === t.value ? 'border-accent scale-110' : 'border-transparent'"
-                :style="{ backgroundColor: t.colorBg }"
-                :title="t.label"
-              >
-                <Check
-                  v-if="theme === t.value"
-                  class="absolute inset-0 m-auto"
-                  :style="{ color: t.colorText }"
-                  :size="20"
-                />
-              </button>
-            </div>
-          </div>
-
-          <!-- Font Size -->
-          <div class="flex flex-col gap-2 setting-group">
-            <span class="text-xs text-text-muted font-bold uppercase tracking-widest">Size</span>
-            <div class="flex items-center justify-between bg-background-tertiary rounded-lg p-1">
-              <button
-                @click="store.decreaseFont"
-                class="w-10 h-8 flex items-center justify-center hover:bg-background-primary rounded transition-colors"
-              >
-                <Minus :size="14" />
-              </button>
-              <span class="text-sm font-sans font-medium w-12 text-center">{{ fontSize }}px</span>
-              <button
-                @click="store.increaseFont"
-                class="w-10 h-8 flex items-center justify-center hover:bg-background-primary rounded transition-colors"
-              >
-                <Plus :size="14" />
-              </button>
-            </div>
-          </div>
-
-          <!-- Font Weight -->
-          <div class="flex flex-col gap-2 setting-group">
-            <span class="text-xs text-text-muted font-bold uppercase tracking-widest">Weight</span>
-            <div class="flex items-center justify-between bg-background-tertiary rounded-lg p-1">
-              <button
-                @click="store.decreaseWeight"
-                :disabled="fontWeight <= 100"
-                class="w-10 h-8 flex items-center justify-center hover:bg-background-primary rounded transition-colors disabled:opacity-50"
-              >
-                <Minus :size="14" />
-              </button>
-              <span class="text-sm font-sans font-medium w-20 text-center">{{ fontWeight }}</span>
-              <button
-                @click="store.increaseWeight"
-                :disabled="fontWeight >= 900"
-                class="w-10 h-8 flex items-center justify-center hover:bg-background-primary rounded transition-colors disabled:opacity-50"
-              >
-                <Plus :size="14" />
-              </button>
-            </div>
-          </div>
-
-          <!-- Tracking -->
-          <div class="flex flex-col gap-2 setting-group">
-            <span class="text-xs text-text-muted font-bold uppercase tracking-widest"
-              >Tracking</span
+          <!-- Header / Tabs -->
+          <div class="flex border-b border-border/40 p-1.5 bg-background-tertiary/20 gap-1.5">
+            <button
+              v-for="tab in ['style', 'tune'] as const"
+              :key="tab"
+              @click="activeTab = tab"
+              class="flex-1 py-2 text-[11px] font-bold uppercase tracking-wider rounded-lg transition-all flex items-center justify-center gap-2 select-none"
+              :class="
+                activeTab === tab
+                  ? 'bg-background-primary text-text-primary shadow-sm ring-1 ring-border/50'
+                  : 'text-text-muted hover:text-text-secondary hover:bg-background-tertiary/50'
+              "
             >
-            <div class="flex items-center justify-between bg-background-tertiary rounded-lg p-1">
-              <button
-                @click="store.decreaseSpacing"
-                :disabled="letterSpacing <= -2"
-                class="w-10 h-8 flex items-center justify-center hover:bg-background-primary rounded transition-colors disabled:opacity-50"
-              >
-                <Minus :size="14" />
-              </button>
-              <span class="text-sm font-sans font-medium w-20 text-center"
-                >{{ letterSpacing }}px</span
-              >
-              <button
-                @click="store.increaseSpacing"
-                :disabled="letterSpacing >= 10"
-                class="w-10 h-8 flex items-center justify-center hover:bg-background-primary rounded transition-colors disabled:opacity-50"
-              >
-                <Plus :size="14" />
-              </button>
-            </div>
+              <component :is="tab === 'style' ? Palette : SlidersHorizontal" :size="14" />
+              {{ tab === 'style' ? 'Display' : 'Fine Tune' }}
+            </button>
           </div>
 
-          <!-- Typeface -->
-          <div class="flex flex-col gap-2 setting-group">
-            <span class="text-xs text-text-muted font-bold uppercase tracking-widest"
-              >Typeface</span
-            >
-            <div class="flex bg-background-tertiary rounded-lg p-1">
-              <button
-                @click="store.setFontFamily('serif')"
-                :class="[
-                  'flex-1 py-1.5 text-sm rounded transition-all font-display',
-                  fontFamily === 'serif'
-                    ? 'bg-background-primary shadow-sm text-text-primary'
-                    : 'text-text-muted hover:text-text-secondary',
-                ]"
-              >
-                Serif
-              </button>
-              <button
-                @click="store.setFontFamily('sans')"
-                :class="[
-                  'flex-1 py-1.5 text-sm rounded transition-all font-sans',
-                  fontFamily === 'sans'
-                    ? 'bg-background-primary shadow-sm text-text-primary'
-                    : 'text-text-muted hover:text-secondary',
-                ]"
-              >
-                Sans
-              </button>
-            </div>
-          </div>
-
-          <!-- Layout -->
-          <div class="flex flex-col gap-2 setting-group">
-            <span class="text-xs text-text-muted font-bold uppercase tracking-widest">Layout</span>
-            <div class="grid grid-cols-2 gap-2">
-              <!-- Line Height -->
-              <div class="flex bg-background-tertiary rounded-lg p-1">
-                <button
-                  v-for="lh in lineHeights"
-                  :key="lh.value"
-                  @click="store.setLineHeight(lh.value)"
-                  :class="[
-                    'flex-1 flex items-center justify-center rounded-md transition-all h-8',
-                    lineHeight === lh.value
-                      ? 'bg-background-primary text-text-primary shadow-sm'
-                      : 'text-text-muted hover:text-secondary',
-                  ]"
-                >
-                  <component :is="lh.icon" :size="18" />
-                </button>
-              </div>
-              <!-- Page Width -->
-              <div class="flex bg-background-tertiary rounded-lg p-1">
-                <button
-                  v-for="width in ['narrow', 'standard', 'wide'] as const"
-                  :key="width"
-                  @click="store.setPageWidth(width)"
-                  :class="[
-                    'flex-1 flex items-center justify-center rounded-md transition-all h-8',
-                    pageWidth === width
-                      ? 'bg-background-primary text-text-primary shadow-sm'
-                      : 'text-text-muted hover:text-secondary',
-                  ]"
-                >
-                  <component
-                    :is="
-                      width === 'narrow'
-                        ? AlignCenter
-                        : width === 'standard'
-                          ? AlignJustify
-                          : AlignLeft
-                    "
-                    :size="18"
-                  />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Haptics -->
-          <div class="flex flex-col gap-2 setting-group pt-2 border-t border-border/50">
-            <div class="flex items-center justify-between">
-              <span class="text-xs text-text-muted font-bold uppercase tracking-widest"
-                >Haptic Feedback</span
-              >
-              <button
-                @click="store.toggleHaptics"
-                class="w-12 h-6 rounded-full transition-colors relative flex items-center px-1"
-                :class="enableHaptics ? 'bg-accent' : 'bg-background-tertiary'"
-              >
-                <div
-                  class="w-4 h-4 rounded-full bg-background-primary shadow-sm transition-transform duration-300"
-                  :class="enableHaptics ? 'translate-x-6' : 'translate-x-0'"
-                ></div>
-              </button>
+          <!-- Content Area -->
+          <div class="p-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
+            <div class="relative">
+              <SettingsTabDisplay v-if="activeTab === 'style'" />
+              <SettingsTabTune v-else />
             </div>
           </div>
         </div>
