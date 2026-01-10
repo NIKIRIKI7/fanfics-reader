@@ -1,0 +1,1 @@
+export type { Collection, CollectionIcon } from './model/types'

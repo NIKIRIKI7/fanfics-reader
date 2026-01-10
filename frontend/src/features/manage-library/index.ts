@@ -1,2 +1,6 @@
 export { default as BookmarkButton } from './ui/BookmarkButton.vue'
+export { default as DeleteCollectionModal } from './ui/DeleteCollectionModal.vue'
+export { default as ManageCollectionModal } from './ui/ManageCollectionModal.vue'
+export { default as CollectionHeader } from './ui/CollectionHeader.vue'
+export { default as CollectionTabs } from './ui/CollectionTabs.vue'
 export { useLibraryStore } from './model/store'
