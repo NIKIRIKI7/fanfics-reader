@@ -33,6 +33,7 @@ onUnmounted(() => {
   window.removeEventListener('resize', checkMobile)
 })
 
+// Styles for the dark overlays
 const topCurtainStyle = computed(() => ({
   height: `${Math.max(0, cursorY.value - rulerHeight.value / 2)}px`,
   backgroundColor: `rgba(0, 0, 0, ${rulerIntensity.value})`,
@@ -41,6 +42,11 @@ const topCurtainStyle = computed(() => ({
 const bottomCurtainStyle = computed(() => ({
   top: `${cursorY.value + rulerHeight.value / 2}px`,
   backgroundColor: `rgba(0, 0, 0, ${rulerIntensity.value})`,
+}))
+
+const rulerBoxStyle = computed(() => ({
+  top: `${cursorY.value - rulerHeight.value / 2}px`,
+  height: `${rulerHeight.value}px`
 }))
 
 const onEnter = (el: Element, done: () => void) => {
@@ -66,14 +72,12 @@ const onLeave = (el: Element, done: () => void) => {
 
         <div
           class="absolute left-0 w-full border-y border-red-500/20 transition-[top,height] duration-75 ease-linear will-change-[top,height]"
-          :style="{
-            top: `${cursorY - rulerHeight.value / 2}px`,
-            height: `${rulerHeight.value}px`
-          }"
+          :style="rulerBoxStyle"
         >
           <div class="absolute top-1/2 left-0 w-full h-px bg-red-500/20"></div>
         </div>
 
+        <!-- Bottom Curtain -->
         <div
           class="absolute bottom-0 left-0 w-full transition-[top] duration-75 ease-linear will-change-[top]"
           :style="bottomCurtainStyle"
