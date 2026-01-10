@@ -28,6 +28,7 @@ onMounted(() => {
     <HomeHero />
 
     <div class="relative z-10 bg-background-primary border-t border-border">
+
       <HomeLatestWorks />
 
       <!-- Блок недавно просмотренных -->

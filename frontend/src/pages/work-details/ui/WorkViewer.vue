@@ -18,6 +18,7 @@ import { ShareButton } from '@/features/share-work'
 import { AudioReaderWidget } from '@/features/audio-reader'
 import { DownloadButton } from '@/features/offline-mode'
 import { useContentProtection } from '@/features/content-protection'
+import { useReadingHabitStore } from '@/features/track-reading-habit' // NEW (Updated to use new store)
 import { storeToRefs } from 'pinia'
 import {
   onEnterFade,
@@ -37,6 +38,7 @@ const route = useRoute()
 const progressStore = useReadingProgressStore()
 const settingsStore = useReadingSettingsStore()
 const historyStore = useViewHistoryStore()
+const habitStore = useReadingHabitStore() // NEW (Will use the updated store)
 
 const { isFocusMode, isInfiniteScrollEnabled } = storeToRefs(settingsStore)
 
@@ -163,6 +165,16 @@ const observeChaptersVisibility = () => {
 const updateActiveChapter = (chapter: number) => {
   currentVisibleChapter.value = chapter
 
+  // LOGIC: Если мы перешли к новой главе, считаем, что пользователь "прочитал" предыдущую.
+  // Для простоты, берем примерное кол-во слов на главу (всего слов / всего глав).
+  // В реальном API у каждой главы был бы свой wordCount.
+  const estimatedWordsPerChapter = Math.floor(props.work.stats.words / props.work.stats.chapters)
+
+  // Добавляем слова в статистику (только если это не инициализация страницы 1)
+  // Чтобы не дублировать при инициализации, можно проверить isLoadingNext или флаг initialized.
+  // Но так как updateActiveChapter вызывается при скролле, это норм.
+  habitStore.recordChapterRead(estimatedWordsPerChapter)
+
   // Обновляем URL без перезагрузки (Shallow)
   router.replace({
     query: { ...route.query, chapter: chapter.toString() }
@@ -222,7 +234,17 @@ const resumeReading = () => {
   }
 }
 
+// Also worth adding handler for page visibility (if user minimized tab)
+const handleVisibilityChange = () => {
+  if (document.hidden) {
+    habitStore.endSession()
+  } else {
+    habitStore.startSession()
+  }
+}
+
 onMounted(async () => {
+  habitStore.startSession() // Start tracking time
   // LINTER FIX: await добавлен
   await initChapters()
   checkProgress()
@@ -239,13 +261,17 @@ onMounted(async () => {
   watch(isInfiniteScrollEnabled, () => {
     setupInfiniteScroll()
   })
+
+  document.addEventListener('visibilitychange', handleVisibilityChange)
 })
 
 onUnmounted(() => {
+  habitStore.endSession() // Stop tracking
   if (observer) observer.disconnect()
   if (visibilityObserver) visibilityObserver.disconnect()
   settingsStore.setFocusMode(false)
   settingsStore.closeSettings()
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 </script>
 

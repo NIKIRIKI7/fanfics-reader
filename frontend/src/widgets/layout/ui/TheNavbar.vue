@@ -9,7 +9,8 @@ const isMenuOpen = ref(false)
 const links = [
   { path: '/', label: 'Home' },
   { path: '/works', label: 'Works' },
-  { path: '/library', label: 'Library' }, // <--- Добавлено
+  { path: '/library', label: 'Library' },
+  { path: '/profile', label: 'Profile' }, // NEW
   { path: '/archive', label: 'Archive' },
   { path: '/contacts', label: 'Contacts' },
 ]

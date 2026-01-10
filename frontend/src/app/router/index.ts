@@ -10,6 +10,12 @@ const router = createRouter({
       name: 'home',
       component: HomePage,
     },
+    // NEW: Profile Route
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('@/pages/profile').then((m) => m.ProfilePage),
+    },
     {
       path: '/works',
       name: 'works',
@@ -31,7 +37,6 @@ const router = createRouter({
       name: 'work-details',
       component: () => import('@/pages/work-details').then((m) => m.WorkDetailsPage),
     },
-    // !!! НОВЫЙ РОУТ !!!
     {
       path: '/library',
       name: 'library',
