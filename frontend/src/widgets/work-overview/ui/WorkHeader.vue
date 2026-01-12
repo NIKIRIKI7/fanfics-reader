@@ -4,12 +4,13 @@ import type { Work } from '@/entities/work'
 import { BookmarkButton } from '@/features/manage-library'
 import { ShareButton } from '@/features/share-work'
 import { DownloadButton } from '@/features/offline-mode'
+import { LikeButton } from '@/features/interact-with-work' // Импорт
 import {
-  ThumbsUp, MessageSquare, BookOpen, Clock,
+  MessageSquare, BookOpen, Clock,
   AlertTriangle, Hash
 } from 'lucide-vue-next'
-import BaseButton from '@/shared/ui/BaseButton.vue'
 import BaseTag from '@/shared/ui/BaseTag.vue'
+import BaseButton from '@/shared/ui/BaseButton.vue'
 
 const props = defineProps<{ work: Work }>()
 defineEmits<{
@@ -94,26 +95,28 @@ const formattedDate = computed(() => new Date(props.work.stats.date).toLocaleDat
         </div>
       </div>
 
-      <!-- Detailed Stats Grid -->
+      <!-- Detailed Stats Grid (UPDATED) -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-y border-border/50">
-        <div class="flex flex-col gap-1">
-          <span class="flex items-center gap-1.5 text-[10px] uppercase font-bold text-text-muted">
-            <ThumbsUp :size="12" /> Likes
-          </span>
-          <span class="text-lg font-mono font-bold text-text-primary">{{ work.stats.kudos }}</span>
-        </div>
+        <!-- 1. Interactive Like Button -->
+        <LikeButton :work-id="work.id" :initial-count="work.stats.kudos" />
+
+        <!-- 2. Comments (Static view, interacts via scroll usually) -->
         <div class="flex flex-col gap-1">
           <span class="flex items-center gap-1.5 text-[10px] uppercase font-bold text-text-muted">
             <MessageSquare :size="12" /> Comments
           </span>
           <span class="text-lg font-mono font-bold text-text-primary">{{ work.stats.comments || 0 }}</span>
         </div>
+
+        <!-- 3. Pages -->
         <div class="flex flex-col gap-1">
           <span class="flex items-center gap-1.5 text-[10px] uppercase font-bold text-text-muted">
             <BookOpen :size="12" /> Pages
           </span>
           <span class="text-lg font-mono font-bold text-text-primary">{{ work.stats.chapters }}</span>
         </div>
+
+        <!-- 4. Date -->
         <div class="flex flex-col gap-1">
           <span class="flex items-center gap-1.5 text-[10px] uppercase font-bold text-text-muted">
             <Clock :size="12" /> Updated
