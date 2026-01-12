@@ -7,8 +7,8 @@ export const useUserStore = defineStore('user', () => {
 
   // Default State
   const profile = ref<UserProfile>({
-    username: 'Guest Reader',
-    avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=GreySky',
+    username: 'Operative',
+    avatarUrl: 'https://images.unsplash.com/photo-1614726365723-49cfae96a6f6?q=80&w=200&auto=format&fit=crop',
     joinDate: new Date().toISOString(),
     level: 1,
     stats: {
@@ -93,6 +93,11 @@ export const useUserStore = defineStore('user', () => {
     return false
   }
 
+  const setAvatar = (url: string) => {
+    profile.value.avatarUrl = url
+    save() // Сохраняем в localStorage
+  }
+
   // --- Getters ---
 
   const wpm = computed(() => {
@@ -164,6 +169,7 @@ export const useUserStore = defineStore('user', () => {
     profile,
     updateReadingSession,
     unlockAchievement,
+    setAvatar, // Экспортируем action
     wpm,
     calculatedStreak,
     formattedTotalTime,
